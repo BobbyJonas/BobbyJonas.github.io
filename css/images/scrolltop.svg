@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 23.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="图层_1" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 28 32"
+	 style="enable-background:new 0 0 28 32;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill-rule:evenodd;clip-rule:evenodd;fill:#666464;}
+</style>
+<title>arrow-top</title>
+<desc>Created with Sketch Beta.</desc>
+<g id="Page-1" sketch:type="MSPage">
+	<g id="Icon-Set" transform="translate(-466.000000, -931.000000)" sketch:type="MSLayerGroup">
+		<path id="arrow-top" sketch:type="MSShapeGroup" class="st0" d="M490,931h-20c-2.2,0-4,1.8-4,4v20c0,2.2,1.8,4,4,4h3v-2h-3
+			c-1.1,0-2-0.9-2-2v-20c0-1.1,0.9-2,2-2h20c1.1,0,2,0.9,2,2v20c0,1.1-0.9,2-2,2h-3v2h3c2.2,0,4-1.8,4-4v-20
+			C494,932.8,492.2,931,490,931L490,931z M487.7,944.2l-6.9-6.9c-0.2-0.2-0.5-0.3-0.8-0.3c-0.3,0-0.5,0.1-0.8,0.3l-6.9,6.9
+			c-0.4,0.4-0.4,1,0,1.4c0.4,0.4,1,0.4,1.4,0l5.2-5.2V962c0,0.6,0.4,1,1,1c0.6,0,1-0.4,1-1v-21.6l5.2,5.2c0.4,0.4,1,0.4,1.4,0
+			C488,945.3,488,944.6,487.7,944.2L487.7,944.2z"/>
+	</g>
+</g>
+</svg>

@@ -1091,6 +1091,26 @@ a.article-title:hover {
   line-height: 1.6em;
   font-size: 0.85em;
 }
+#goBack {
+  bottom: 40px;
+  right: 0;
+  width: 26px;
+  height: 28px;
+  margin-right: 30px;
+  text-align: center;
+  background: rgba(238,238,238,0.8) url("images/scrolltop.svg") no-repeat 4px 3px;
+  -webkit-background-size: 18px;
+  -moz-background-size: 18px;
+  background-size: 18px;
+  position: fixed;
+  cursor: pointer;
+  border-radius: 3px;
+  -webkit-box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
+  box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
+}
+#goBack:hover {
+  background-color: rgba(221,226,236,0.8);
+}
 .article-entry pre,
 .article-entry .highlight {
   background: #2d2d2d;
