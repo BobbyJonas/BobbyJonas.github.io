@@ -96,7 +96,7 @@
 </li>
 </ul>
 <p>但上述方式只适合小范围的共享，因此就引入了 <strong>vuex</strong></p>
-<h3 id="1-2-vuex是什么"><a href="#1-2-vuex是什么" class="headerlink" title="1.2　vuex是什么"></a>1.2　vuex是什么</h3><p>**vuex **是实现组件全局状态(数据)管理的一种机制</p>
+<h3 id="1-2-vuex是什么"><a href="#1-2-vuex是什么" class="headerlink" title="1.2　vuex是什么"></a>1.2　vuex是什么</h3><p><strong>vuex</strong> 是实现组件全局状态(数据)管理的一种机制</p>
 <p><img src="https://ucc.alicdn.com/pic/developer-ecology/754f956ae5524c2c870824c7431bffd4.png" alt="Redux"></p>
 <p><em>虽然上面是 redux 的图，但换成 vuex 其实几乎一样</em></p>
 <p><strong>没有 vuex</strong>：要子向父、父再向子传递数据，才能进行共享</p>
@@ -181,7 +181,7 @@
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 触发 Action</span></span><br><span class="line">methods: &#123;</span><br><span class="line">  <span class="function"><span class="title">handle</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 触发 actions 的第一种方式</span></span><br><span class="line">    <span class="built_in">this</span>.$store.dispatch(<span class="string">&#x27;addAsync&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>Action 中函数的第一个形参必然是 context，context 为一个 vue 实例。</p>
-<p><strong>注意规范写法</strong>：改变数据使用 <code>commit</code>触发mutation，异步操作使用 <code>dispatch</code>触发action。</p>
+<p><strong>注意规范写法</strong>：改变数据使用 <code>commit</code>触发 mutation，异步操作使用 <code>dispatch</code>触发 action。</p>
 <p>触发 action 异步任务，也可以携带参数：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义 Action</span></span><br><span class="line"><span class="keyword">const</span> store = <span class="keyword">new</span> Vuex.Store(&#123;</span><br><span class="line">  <span class="comment">// ...省略其他代码</span></span><br><span class="line">  mutations: &#123;</span><br><span class="line">    <span class="function"><span class="title">addN</span>(<span class="params">state, step</span>)</span> &#123;</span><br><span class="line">      state.count += step</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  actions: &#123;</span><br><span class="line">    <span class="function"><span class="title">addNAsync</span>(<span class="params">context, step</span>)</span> &#123;</span><br><span class="line">      <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        context.commit(<span class="string">&#x27;addN&#x27;</span>, step)</span><br><span class="line">      &#125;, <span class="number">1000</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
 
@@ -212,7 +212,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/12/28/vuex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-id="ckj9o8cvb0006gd01d3naf000" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/12/28/vuex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-id="ckj9oc9120003iy012xjx11tz" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vuex/" rel="tag">vuex</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -260,7 +260,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/23/%E5%AE%9E%E7%8E%B0table%E5%9C%A8%E9%A1%B5%E9%9D%A2%E4%B8%AD%E5%B1%85%E4%B8%AD%E6%98%BE%E7%A4%BA/" data-id="ckj9o8cvc0007gd01b9jt80vt" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/23/%E5%AE%9E%E7%8E%B0table%E5%9C%A8%E9%A1%B5%E9%9D%A2%E4%B8%AD%E5%B1%85%E4%B8%AD%E6%98%BE%E7%A4%BA/" data-id="ckj9oc90z0001iy016om99fg1" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/table/" rel="tag">table</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -329,7 +329,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/16/%E5%88%87%E6%8D%A2node%E7%9A%84%E7%89%88%E6%9C%AC/" data-id="ckj9o8cv40001gd01atc97649" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/16/%E5%88%87%E6%8D%A2node%E7%9A%84%E7%89%88%E6%9C%AC/" data-id="ckj9oc90u0000iy017rmkelg4" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -410,7 +410,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/13/%E7%94%A8hexo%E5%88%9B%E5%BB%BA%E5%8D%9A%E5%AE%A2/" data-id="ckj9o8cvd0009gd01arh5fcpr" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/13/%E7%94%A8hexo%E5%88%9B%E5%BB%BA%E5%8D%9A%E5%AE%A2/" data-id="ckj9oc91f000iiy01dszw57kt" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/blog/" rel="tag">blog</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/markdown/" rel="tag">markdown</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -461,7 +461,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/13/hello-world/" data-id="ckj9o8cv00000gd01h3ex6dc9" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/13/hello-world/" data-id="ckj9oc9130004iy010k9r5zt6" class="article-share-link">分享</a>
       
       
     </footer>
