@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>nuxt.js个人使用笔记 | 闲言碎语的小站</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Nuxt.js 简介 随着工程量的不断增加，业务处理复杂度提高，传统架构的项目整体加载速度可能会越来越慢；与此同时，SPA 在内的组件化开发对 SEO 也非常不友好。 现在很多应用就开始使用 SSR 来解决这两个问题，但采用 SSR 在另一方面也给服务器增加了压力。 Nuxt.js 便是一个支持 SSR 的前端框架，基于 Vue.js，通过对客户端 &#x2F; 服务端基础架构的抽象组织，Nuxt.js 主">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nuxt.js个人使用笔记">
+<meta property="og:url" content="https://bobbyjonas.github.io/2021/01/24/nuxt.js%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="闲言碎语的小站">
+<meta property="og:description" content="Nuxt.js 简介 随着工程量的不断增加，业务处理复杂度提高，传统架构的项目整体加载速度可能会越来越慢；与此同时，SPA 在内的组件化开发对 SEO 也非常不友好。 现在很多应用就开始使用 SSR 来解决这两个问题，但采用 SSR 在另一方面也给服务器增加了压力。 Nuxt.js 便是一个支持 SSR 的前端框架，基于 Vue.js，通过对客户端 &#x2F; 服务端基础架构的抽象组织，Nuxt.js 主">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-01-24T14:07:31.074Z">
+<meta property="article:modified_time" content="2021-01-24T14:56:18.541Z">
+<meta property="article:author" content="Bob">
+<meta property="article:tag" content="前端">
+<meta property="article:tag" content="vue">
+<meta property="article:tag" content="nuxt">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/#" title="闲言碎语的小站" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">闲言碎语的小站</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">主页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/#" title="RSS 流"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://bobbyjonas.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-nuxt.js个人使用笔记" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/01/24/nuxt.js%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/" class="article-date">
+  <time datetime="2021-01-24T14:07:31.074Z" itemprop="datePublished">2021-01-24</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      nuxt.js个人使用笔记
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Nuxt-js-简介"><a href="#Nuxt-js-简介" class="headerlink" title="Nuxt.js 简介"></a>Nuxt.js 简介</h2><ul>
+<li>随着工程量的不断增加，业务处理复杂度提高，传统架构的项目整体加载速度可能会越来越慢；与此同时，SPA 在内的组件化开发对 SEO 也非常不友好。</li>
+<li>现在很多应用就开始使用 SSR 来解决这两个问题，但采用 SSR 在另一方面也给服务器增加了压力。</li>
+<li>Nuxt.js 便是一个支持 SSR 的前端框架，基于 Vue.js，通过对客户端 / 服务端基础架构的抽象组织，Nuxt.js 主要关注的是应用的 UI 渲染。</li>
+</ul>
+<blockquote>
+<p>官网：<a target="_blank" rel="noopener" href="https://www.nuxtjs.cn/guide">https://www.nuxtjs.cn/guide</a></p>
+</blockquote>
+<h2 id="创建-Nuxt-项目"><a href="#创建-Nuxt-项目" class="headerlink" title="创建 Nuxt 项目"></a>创建 Nuxt 项目</h2><h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>Nuxt.js 团队创建了脚手架工具 create-nuxt-app，这里直接使用 npx 安装。<br>期间会提示项目名称、UI 框架、Web 框架、SSR 模式还是单页面模式等的选择，根据自己的需要进行选择。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx create-nuxt-app 项目名</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="加载"><a href="#加载" class="headerlink" title="加载"></a>加载</h3><p>等项目 build 完成，进入项目根目录下启动项目。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run dev</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="查看"><a href="#查看" class="headerlink" title="查看"></a>查看</h3><p>启动默认端口为3000，在启动完成会给出主页的url，在浏览器输入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;localhost:3000</span><br></pre></td></tr></table></figure>
+
+<h4 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">.nuxt       打包的项目</span><br><span class="line">assets      存放资源文件 (图片, 默认 CSS 代码等)</span><br><span class="line">components  组件文件</span><br><span class="line">layouts     布局目录</span><br><span class="line">middleware  中间件</span><br><span class="line">pages       默认路由对应的页面</span><br><span class="line">plugins     插件配置文件</span><br><span class="line">static      静态文件 (也可以存放图片等资源)</span><br><span class="line">store       Vuex 文件</span><br><span class="line">nuxt.config.js     配置文件 (vue.config.js 相似)</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Nuxt-js-使用"><a href="#Nuxt-js-使用" class="headerlink" title="Nuxt.js 使用"></a>Nuxt.js 使用</h2><h3 id="CSS-相关"><a href="#CSS-相关" class="headerlink" title="CSS 相关"></a>CSS 相关</h3><h4 id="全局引入"><a href="#全局引入" class="headerlink" title="全局引入"></a>全局引入</h4><ol>
+<li>在 assets 目录下新建 <code>css/global.css</code> 文件，写入如下内容：<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">body</span> &#123;</span><br><span class="line">  <span class="attribute">background-color</span>: red;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>然后在 nuxt.config.js 的 css 下修改为下面配置：</li>
+</ol>
+<p><strong>注意</strong>：Nuxt 团队给出了 nuxt.config.js 中 css 项的加载顺序，是按照 css 的扩展文件名来排序的。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">css: [</span><br><span class="line">  <span class="string">&#x27;@/assets/css/global.css&#x27;</span></span><br><span class="line">],</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>运行项目，可以看到所有项目背景都为红色了。</li>
+</ol>
+<h4 id="路由过渡动画"><a href="#路由过渡动画" class="headerlink" title="路由过渡动画"></a>路由过渡动画</h4><p>Nuxt.js 使用 Vue.js 的组件来实现路由切换时的过渡动效。<br>修改上面建的 <code>assets/css/global.css</code> 文件，添加下面样式：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">​```</span><br><span class="line"><span class="selector-class">.page-enter-active</span>, <span class="selector-class">.page-leave-active</span> &#123;</span><br><span class="line">  <span class="attribute">transition</span>: opacity .<span class="number">5s</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.page-enter</span>, <span class="selector-class">.page-leave-active</span> &#123;</span><br><span class="line">  <span class="attribute">opacity</span>: <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line">​```</span><br></pre></td></tr></table></figure>
+
+<p>再次点击跳转，便有了动画效果。</p>
+<h3 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h3><p>Nuxt 默认会监听 <code>pages</code> 目录下的文件变化，新建 .vue 文件时会自动添加到路由中，路由模式便是文件的位置信息，可在 <code>.nuxt/routes.json</code> 中查看。</p>
+<h4 id="基础路由"><a href="#基础路由" class="headerlink" title="基础路由"></a>基础路由</h4><p><code>pages</code>的目录结构：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pages&#x2F;</span><br><span class="line">--| user&#x2F;</span><br><span class="line">-----| index.vue</span><br><span class="line">--| index.vue</span><br><span class="line">--| test.vue</span><br></pre></td></tr></table></figure>
+
+<p><code>routes.json</code>自动生成的配置：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">  &#123;</span><br><span class="line">    name: &#x27;index&#x27;,</span><br><span class="line">    path: &#x27;/&#x27;,</span><br><span class="line">    component: &#x27;pages/index.vue&#x27;</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    name: &#x27;test&#x27;,</span><br><span class="line">    path: &#x27;/test&#x27;,</span><br><span class="line">    component: &#x27;pages/test.vue&#x27;</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    name: &#x27;user&#x27;,</span><br><span class="line">    path: &#x27;/user&#x27;,</span><br><span class="line">    component: &#x27;pages/user/index.vue&#x27;</span><br><span class="line">  &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<h4 id="路由跳转"><a href="#路由跳转" class="headerlink" title="路由跳转"></a>路由跳转</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">nuxt-link</span> <span class="attr">to</span>=<span class="string">&quot;/&quot;</span>&gt;</span>首页<span class="tag">&lt;/<span class="name">nuxt-link</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="动态路由"><a href="#动态路由" class="headerlink" title="动态路由"></a>动态路由</h4><p>需要创建对应的以下划线作为前缀的 Vue 文件或目录：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pages&#x2F;</span><br><span class="line">--| users&#x2F;</span><br><span class="line">-----| _id.vue</span><br><span class="line">--| index.vue</span><br></pre></td></tr></table></figure>
+
+<p><code>routes.json</code>自动生成的配置：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">  &#123;</span><br><span class="line">    name: &#x27;index&#x27;,</span><br><span class="line">    path: &#x27;/&#x27;,</span><br><span class="line">    component: &#x27;pages/index.vue&#x27;</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    name: &#x27;users-id&#x27;,</span><br><span class="line">    path: &#x27;/users/:id?&#x27;,</span><br><span class="line">    component: &#x27;pages/users/_id.vue&#x27;</span><br><span class="line">  &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p><code>users-id</code> 的路由路径带有 <code>:id?</code> 参数，表示该路由是可选的，可在跳转时传递参数。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">nuxt-link</span> <span class="attr">to</span>=<span class="string">&quot;/users/123&quot;</span>&gt;</span>首页<span class="tag">&lt;/<span class="name">nuxt-link</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在 <code>users/_id.vue</code> 页面中获取参数：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> param = <span class="built_in">this</span>.$route.params.id;</span><br></pre></td></tr></table></figure>
+
+<h4 id="嵌套路由"><a href="#嵌套路由" class="headerlink" title="嵌套路由"></a>嵌套路由</h4><p>嵌套路由，可在页面中嵌套子页面，可用于 table 切换之类的场景。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pages&#x2F;</span><br><span class="line">--| users&#x2F;</span><br><span class="line">-----| _id.vue</span><br><span class="line">-----| index.vue</span><br><span class="line">--| users.vue</span><br></pre></td></tr></table></figure>
+
+<p><code>routes.json</code> 自动生成的配置：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">  &#123;</span><br><span class="line">    path: &#x27;/users&#x27;,</span><br><span class="line">    component: &#x27;pages/users.vue&#x27;,</span><br><span class="line">    children: [</span><br><span class="line">      &#123;</span><br><span class="line">        path: &#x27;&#x27;,</span><br><span class="line">        component: &#x27;pages/users/index.vue&#x27;,</span><br><span class="line">        name: &#x27;users&#x27;</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        path: &#x27;:id&#x27;,</span><br><span class="line">        component: &#x27;pages/users/_id.vue&#x27;,</span><br><span class="line">        name: &#x27;users-id&#x27;</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>嵌套路由需在父容器中使用 nuxt-child 显示子页面，默认显示 <code>users/index.vue</code>，切换子页面同样使用：nuxt-link 。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">nuxt-child</span> <span class="attr">keep-alive</span> <span class="attr">:foobar</span>=<span class="string">&quot;123&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">nuxt-child</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="中间件"><a href="#中间件" class="headerlink" title="中间件"></a>中间件</h3><p>中间件允许您定义一个自定义函数运行在一个页面或一组页面渲染之前，每一个中间件应放置在 <code>middleware</code> 目录下。</p>
+<p>比如我可以利用<strong>中间件</strong>，来进行路由跳转时的验证：</p>
+<ol>
+<li>新建<code>middleware/auth.js</code>文件，写入如下内容：</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> (<span class="params">context</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;start&quot;</span>);</span><br><span class="line">  context.userAgent = process.server ? context.req.headers[<span class="string">&#x27;user-agent&#x27;</span>] : 	navigator.userAgent;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>在<code>nuxt.config.js</code>文件中添加：</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">router: &#123;</span><br><span class="line">  middleware: <span class="string">&#x27;auth&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>再次运行，便可看到每次打开页面都会打印日志。</li>
+</ol>
+<h3 id="布局"><a href="#布局" class="headerlink" title="布局"></a>布局</h3><h4 id="默认布局"><a href="#默认布局" class="headerlink" title="默认布局"></a>默认布局</h4><p>可通过添加 <code>layouts/default.vue</code> 文件来扩展应用的默认布局。<br>但一定要添加显示页面的主体内容。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span>&gt;</span>标题<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">nuxt</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="错误页面"><a href="#错误页面" class="headerlink" title="错误页面"></a>错误页面</h4><p>新建<code>layouts/error.vue</code>文件，添加如下内容，样式可自己修改：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;container&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h1</span>&gt;</span>404<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h1</span> <span class="attr">v-if</span>=<span class="string">&quot;error.statusCode === 404&quot;</span>&gt;</span>页面不存在<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h1</span> <span class="attr">v-else</span>&gt;</span>应用发生错误异常<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">nuxt-link</span> <span class="attr">to</span>=<span class="string">&quot;/&quot;</span>&gt;</span>首 页<span class="tag">&lt;/<span class="name">nuxt-link</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="javascript">    props: [<span class="string">&#x27;error&#x27;</span>],</span></span><br><span class="line"><span class="javascript">    layout: <span class="string">&#x27;blog&#x27;</span> <span class="comment">// 你可以为错误页面指定自定义的布局</span></span></span><br><span class="line">  &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="css">  <span class="selector-class">.container</span> &#123;</span></span><br><span class="line">    width: 20%;</span><br><span class="line">    margin: 50px auto;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="异步数据"><a href="#异步数据" class="headerlink" title="异步数据"></a>异步数据</h3><h4 id="asyncData"><a href="#asyncData" class="headerlink" title="asyncData"></a>asyncData</h4><p>asyncData 方法会在组件 (限于页面组件)每次加载之前被调用。它可以在服务端或路由更新之前被调用。 </p>
+<p>在这个方法被调用的时候，第一个参数被设定为当前页面的上下文对象，你可以利用 asyncData 方法来获取数据，Nuxt.js 会将 asyncData 返回的数据融合组件 data 方法返回的数据一并返回给当前组件。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">import</span> axiox <span class="keyword">from</span> <span class="string">&#x27;axios&#x27;</span>;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">async</span> <span class="function"><span class="title">asyncData</span>(<span class="params">&#123;params&#125;</span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">return</span> axiox.get(<span class="string">&quot;http://localhost/GetData/&quot;</span> + params.id)</span></span><br><span class="line"><span class="javascript">                .then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">                    <span class="built_in">console</span>.log(res.data.title)</span></span><br><span class="line"><span class="javascript">                    <span class="keyword">return</span> &#123;<span class="attr">title</span>: res.data.title&#125;</span></span><br><span class="line">                &#125;);</span><br><span class="line">        &#125;,</span><br><span class="line"><span class="javascript">        <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">return</span> &#123;</span></span><br><span class="line"><span class="javascript">                title: <span class="string">&#x27;NG&#x27;</span></span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="async-await"><a href="#async-await" class="headerlink" title="async / await"></a>async / await</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">import</span> axiox <span class="keyword">from</span> <span class="string">&#x27;axios&#x27;</span>;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">async</span> <span class="function"><span class="title">asyncData</span>(<span class="params">&#123;params&#125;</span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">const</span> &#123; data &#125; = <span class="keyword">await</span> axiox.get(<span class="string">&quot;http://localhost/GetData/&quot;</span> + params.id);</span></span><br><span class="line"><span class="javascript">            <span class="built_in">console</span>.log(data);</span></span><br><span class="line"><span class="javascript">            <span class="keyword">return</span> &#123;<span class="attr">title</span>: data.title&#125;</span></span><br><span class="line">        &#125;,</span><br><span class="line"><span class="javascript">        <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">return</span> &#123;</span></span><br><span class="line"><span class="javascript">                title: <span class="string">&#x27;NG&#x27;</span></span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="回调函数"><a href="#回调函数" class="headerlink" title="回调函数"></a>回调函数</h4><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">import</span> axiox <span class="keyword">from</span> <span class="string">&#x27;axios&#x27;</span>;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="function"><span class="title">asyncData</span>(<span class="params">&#123;params&#125;,callback</span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">           axiox.get(<span class="string">&quot;http://localhost/GetData/&quot;</span> + params.id)</span></span><br><span class="line"><span class="javascript">                .then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">                    <span class="built_in">console</span>.log(res.data.title)</span></span><br><span class="line"><span class="javascript">                    callback(<span class="literal">null</span>, &#123; <span class="attr">title</span>: res.data.title &#125;)</span></span><br><span class="line">                &#125;);</span><br><span class="line">        &#125;,</span><br><span class="line"><span class="javascript">        <span class="function"><span class="title">data</span>(<span class="params"></span>)</span> &#123;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">return</span> &#123;</span></span><br><span class="line"><span class="javascript">                title: <span class="string">&#x27;NG&#x27;</span></span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://bobbyjonas.github.io/2021/01/24/nuxt.js%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/" data-id="ckkb9n0da000498015e0o7xhu" class="article-share-link">分享</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nuxt/" rel="tag">nuxt</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2020/12/28/vuex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">更旧</strong>
+      <div class="article-nav-title">vuex学习笔记</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/blog/" rel="tag">blog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/markdown/" rel="tag">markdown</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nuxt/" rel="tag">nuxt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/table/" rel="tag">table</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuex/" rel="tag">vuex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/blog/" style="font-size: 10px;">blog</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/nuxt/" style="font-size: 10px;">nuxt</a> <a href="/tags/table/" style="font-size: 10px;">table</a> <a href="/tags/vue/" style="font-size: 15px;">vue</a> <a href="/tags/vuex/" style="font-size: 10px;">vuex</a> <a href="/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 20px;">前端</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">十二月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">十一月 2020</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2021/01/24/nuxt.js%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/">nuxt.js个人使用笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2020/12/28/vuex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">vuex学习笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2020/11/23/%E5%AE%9E%E7%8E%B0table%E5%9C%A8%E9%A1%B5%E9%9D%A2%E4%B8%AD%E5%B1%85%E4%B8%AD%E6%98%BE%E7%A4%BA/">实现table在页面中居中显示</a>
+          </li>
+        
+          <li>
+            <a href="/2020/11/16/%E5%88%87%E6%8D%A2node%E7%9A%84%E7%89%88%E6%9C%AC/">切换不同版本的node</a>
+          </li>
+        
+          <li>
+            <a href="/2020/11/13/%E7%94%A8hexo%E5%88%9B%E5%BB%BA%E5%8D%9A%E5%AE%A2/">用hexo创建博客</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  <div id="goBack" onclick="window.scrollTo('0','0')"></div>
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2021 Bob<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">主页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
