@@ -111,18 +111,14 @@
 
 <h2 id="Nuxt-js-使用"><a href="#Nuxt-js-使用" class="headerlink" title="Nuxt.js 使用"></a>Nuxt.js 使用</h2><h3 id="CSS-相关"><a href="#CSS-相关" class="headerlink" title="CSS 相关"></a>CSS 相关</h3><h4 id="全局引入"><a href="#全局引入" class="headerlink" title="全局引入"></a>全局引入</h4><ol>
 <li>在 assets 目录下新建 <code>css/global.css</code> 文件，写入如下内容：<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">body</span> &#123;</span><br><span class="line">  <span class="attribute">background-color</span>: red;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li>然后在 nuxt.config.js 的 css 下修改为下面配置：</li>
+<li>然后在 <code>nuxt.config.js</code> 的 css 下修改为下面配置：<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">css: [</span><br><span class="line">  <span class="string">&#x27;@/assets/css/global.css&#x27;</span></span><br><span class="line">],</span><br></pre></td></tr></table></figure></li>
 </ol>
-<p><strong>注意</strong>：Nuxt 团队给出了 nuxt.config.js 中 css 项的加载顺序，是按照 css 的扩展文件名来排序的。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">css: [</span><br><span class="line">  <span class="string">&#x27;@/assets/css/global.css&#x27;</span></span><br><span class="line">],</span><br></pre></td></tr></table></figure>
-<ol start="3">
-<li>运行项目，可以看到所有项目背景都为红色了。</li>
-</ol>
+<p><strong>注意</strong>：Nuxt 团队给出了 <code>nuxt.config.js</code> 中 css 项的加载顺序，是按照 css 的扩展文件名来排序的，而不是单纯的只看前后顺序。<br>3. 运行项目，可以看到所有项目背景都为红色了。</p>
 <h4 id="路由过渡动画"><a href="#路由过渡动画" class="headerlink" title="路由过渡动画"></a>路由过渡动画</h4><p>Nuxt.js 使用 Vue.js 的组件来实现路由切换时的过渡动效。<br>修改上面建的 <code>assets/css/global.css</code> 文件，添加下面样式：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">​```</span><br><span class="line"><span class="selector-class">.page-enter-active</span>, <span class="selector-class">.page-leave-active</span> &#123;</span><br><span class="line">  <span class="attribute">transition</span>: opacity .<span class="number">5s</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.page-enter</span>, <span class="selector-class">.page-leave-active</span> &#123;</span><br><span class="line">  <span class="attribute">opacity</span>: <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line">​```</span><br></pre></td></tr></table></figure>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.page-enter-active</span>, <span class="selector-class">.page-leave-active</span> &#123;</span><br><span class="line">  <span class="attribute">transition</span>: opacity .<span class="number">5s</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.page-enter</span>, <span class="selector-class">.page-leave-active</span> &#123;</span><br><span class="line">  <span class="attribute">opacity</span>: <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>再次点击跳转，便有了动画效果。</p>
-<h3 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h3><p>Nuxt 默认会监听 <code>pages</code> 目录下的文件变化，新建 .vue 文件时会自动添加到路由中，路由模式便是文件的位置信息，可在 <code>.nuxt/routes.json</code> 中查看。</p>
+<h3 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h3><p>Nuxt 默认会监听 <code>pages</code> 目录下的文件变化，新建 <code>.vue</code> 文件时会自动添加到路由中，路由模式便是文件的位置信息，可在 <code>.nuxt/routes.json</code> 中查看。</p>
 <h4 id="基础路由"><a href="#基础路由" class="headerlink" title="基础路由"></a>基础路由</h4><p><code>pages</code>的目录结构：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pages&#x2F;</span><br><span class="line">--| user&#x2F;</span><br><span class="line">-----| index.vue</span><br><span class="line">--| index.vue</span><br><span class="line">--| test.vue</span><br></pre></td></tr></table></figure>
 
@@ -134,7 +130,7 @@
 <h4 id="动态路由"><a href="#动态路由" class="headerlink" title="动态路由"></a>动态路由</h4><p>需要创建对应的以下划线作为前缀的 Vue 文件或目录：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pages&#x2F;</span><br><span class="line">--| users&#x2F;</span><br><span class="line">-----| _id.vue</span><br><span class="line">--| index.vue</span><br></pre></td></tr></table></figure>
 
-<p><code>routes.json</code>自动生成的配置：</p>
+<p><code>routes.json</code> 自动生成的配置：</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">  &#123;</span><br><span class="line">    name: &#x27;index&#x27;,</span><br><span class="line">    path: &#x27;/&#x27;,</span><br><span class="line">    component: &#x27;pages/index.vue&#x27;</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    name: &#x27;users-id&#x27;,</span><br><span class="line">    path: &#x27;/users/:id?&#x27;,</span><br><span class="line">    component: &#x27;pages/users/_id.vue&#x27;</span><br><span class="line">  &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
 
 <p><code>users-id</code> 的路由路径带有 <code>:id?</code> 参数，表示该路由是可选的，可在跳转时传递参数。</p>
@@ -159,7 +155,7 @@
 <ol>
 <li>新建<code>middleware/auth.js</code>文件，写入如下内容：</li>
 </ol>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> (<span class="params">context</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;start&quot;</span>);</span><br><span class="line">  context.userAgent = process.server ? context.req.headers[<span class="string">&#x27;user-agent&#x27;</span>] : 	navigator.userAgent;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> (<span class="params">context</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;start&quot;</span>);</span><br><span class="line">  context.userAgent = process.server ? context.req.headers[<span class="string">&#x27;user-agent&#x27;</span>] : navigator.userAgent;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <ol start="2">
 <li>在<code>nuxt.config.js</code>文件中添加：</li>
@@ -187,7 +183,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/01/24/nuxt.js%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/" data-id="ckkb9n8f90000a901e6mm674r" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/01/24/nuxt.js%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/" data-id="ckkb9we7t0001mojh1hovb0ni" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nuxt/" rel="tag">nuxt</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -347,7 +343,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/12/28/vuex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-id="ckkb9n8fe0001a9011ymd30sp" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/12/28/vuex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-id="ckkb9we7y0005mojh2gql2d5y" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vuex/" rel="tag">vuex</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -395,7 +391,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/23/%E5%AE%9E%E7%8E%B0table%E5%9C%A8%E9%A1%B5%E9%9D%A2%E4%B8%AD%E5%B1%85%E4%B8%AD%E6%98%BE%E7%A4%BA/" data-id="ckkb9n8fj0005a901g70layxo" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/23/%E5%AE%9E%E7%8E%B0table%E5%9C%A8%E9%A1%B5%E9%9D%A2%E4%B8%AD%E5%B1%85%E4%B8%AD%E6%98%BE%E7%A4%BA/" data-id="ckkb9we7y0006mojh2d14ba4a" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/table/" rel="tag">table</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -464,7 +460,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/16/%E5%88%87%E6%8D%A2node%E7%9A%84%E7%89%88%E6%9C%AC/" data-id="ckkb9n8fh0003a9019i7j4qjy" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/16/%E5%88%87%E6%8D%A2node%E7%9A%84%E7%89%88%E6%9C%AC/" data-id="ckkb9we7x0004mojh9hegc09h" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -545,7 +541,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/13/%E7%94%A8hexo%E5%88%9B%E5%BB%BA%E5%8D%9A%E5%AE%A2/" data-id="ckkb9n8fk0007a901cm7m9col" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/13/%E7%94%A8hexo%E5%88%9B%E5%BB%BA%E5%8D%9A%E5%AE%A2/" data-id="ckkb9we7v0002mojh2i5p0fz3" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/blog/" rel="tag">blog</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/markdown/" rel="tag">markdown</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -596,7 +592,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/13/hello-world/" data-id="ckkb9n8fi0004a901glym18ry" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/13/hello-world/" data-id="ckkb9we7o0000mojhee4wgtbc" class="article-share-link">分享</a>
       
       
     </footer>
