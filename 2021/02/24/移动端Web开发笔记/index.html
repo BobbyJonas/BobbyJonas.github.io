@@ -17,7 +17,7 @@
 <meta property="og:image" content="https://www.runoob.com/wp-content/uploads/2018/07/1532326331-2895-201407.png">
 <meta property="og:image" content="https://www.runoob.com/wp-content/uploads/2018/07/1532326332-9414-201407.png">
 <meta property="article:published_time" content="2021-02-24T12:32:50.176Z">
-<meta property="article:modified_time" content="2021-02-25T12:23:23.271Z">
+<meta property="article:modified_time" content="2021-02-25T12:27:31.812Z">
 <meta property="article:author" content="Bob">
 <meta property="article:tag" content="前端">
 <meta property="article:tag" content="移动端">
@@ -226,8 +226,7 @@
 <h4 id="CSS3-盒子模型-box-sizing"><a href="#CSS3-盒子模型-box-sizing" class="headerlink" title="CSS3 盒子模型 box-sizing"></a>CSS3 盒子模型 box-sizing</h4><ul>
 <li><p>传统模式宽度计算：<code>盒子的宽度 = CSS中设置的width + border + padding</code></p>
 </li>
-<li><p>CSS3盒子模型：　<code>盒子的宽度 = CSS中设置的宽度width里面包含了border和padding</code></p>
-<p>也就是说，我们CSS3中的盒子模型，padding 和 border 不会撑大盒子了</p>
+<li><p>CSS3盒子模型：　<code>盒子的宽度 = CSS中设置的宽度width里面包含了border和padding</code><br>也就是说，我们CSS3中的盒子模型，padding 和 border 不会撑大盒子了</p>
 </li>
 </ul>
 <h4 id="特殊样式设置"><a href="#特殊样式设置" class="headerlink" title="特殊样式设置"></a>特殊样式设置</h4><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* CSS3盒子模型 */</span></span><br><span class="line"><span class="selector-tag">box-sizing</span>: <span class="selector-tag">border-box</span>;</span><br><span class="line"><span class="selector-tag">-webkit-box-sizing</span>: <span class="selector-tag">border-box</span>;</span><br><span class="line"><span class="comment">/* 点击高亮我们需要清除，设置为 transparent 完全透明 */</span></span><br><span class="line"><span class="selector-tag">-webkit-tap-highlight-color</span>: <span class="selector-tag">transparent</span>;</span><br><span class="line"><span class="comment">/* 清除移动端浏览器默认的外观，在 iOS 里加上这个属性才能给按钮和输入框自定义样式 */</span></span><br><span class="line"><span class="selector-tag">-webkit-appearance</span>: <span class="selector-tag">none</span>;</span><br><span class="line"><span class="comment">/* 禁用长按页面时的弹出菜单 */</span></span><br><span class="line"><span class="selector-tag">img</span>, <span class="selector-tag">a</span> &#123; <span class="attribute">-webkit-touch-callout</span>: none; &#125;</span><br></pre></td></tr></table></figure>
@@ -236,14 +235,16 @@
 
 <h3 id="常见布局"><a href="#常见布局" class="headerlink" title="常见布局"></a>常见布局</h3><h4 id="移动端技术选型"><a href="#移动端技术选型" class="headerlink" title="移动端技术选型"></a>移动端技术选型</h4><p>移动端布局和PC端有所区别</p>
 <ol>
-<li>单独制作<strong>移动端</strong>页面 (主流)<ul>
+<li><p>单独制作<strong>移动端</strong>页面 (主流)</p>
+<ul>
 <li>流式布局 (百分比布局)</li>
 <li>flex 弹性布局 (推荐)</li>
 <li>less + rem + 媒体查询布局</li>
 <li>混合布局</li>
 </ul>
 </li>
-<li><strong>响应式</strong>页面兼容移动端 (其次)<ul>
+<li><p><strong>响应式</strong>页面兼容移动端 (其次)</p>
+<ul>
 <li>媒体查询</li>
 <li>bootstrap</li>
 <li>……</li>
@@ -260,8 +261,7 @@
 <li>min-width 最小宽度 (min-height 最小高度)</li>
 </ul>
 <h4 id="flex-布局"><a href="#flex-布局" class="headerlink" title="flex 布局"></a>flex 布局</h4><h5 id="布局原理"><a href="#布局原理" class="headerlink" title="布局原理"></a>布局原理</h5><p>就是通过给父盒子添加 flex 属性，来控制子盒子的位置和排列方式。</p>
-<h5 id="flex-direction-设置主轴的方向"><a href="#flex-direction-设置主轴的方向" class="headerlink" title="flex-direction 设置主轴的方向"></a><code>flex-direction</code> 设置主轴的方向</h5><p><code>flex-direction</code> 属性决定主轴的方向 (即项目的排列方向)</p>
-<p>注意：主轴和侧轴是会变化的，就看 flex-direction 设置谁为主轴，剩下的就是侧轴。主元素是跟着主轴来进行排列的。</p>
+<h5 id="flex-direction-设置主轴的方向"><a href="#flex-direction-设置主轴的方向" class="headerlink" title="flex-direction 设置主轴的方向"></a><code>flex-direction</code> 设置主轴的方向</h5><p><code>flex-direction</code> 属性决定主轴的方向 (即项目的排列方向)<br>注意：主轴和侧轴是会变化的，就看 flex-direction 设置谁为主轴，剩下的就是侧轴。主元素是跟着主轴来进行排列的。</p>
 <table>
 <thead>
 <tr>
@@ -396,12 +396,9 @@
 <li>总结：单行找<code>align-items</code>，多行找<code>align-content</code>。</li>
 </ul>
 <h4 id="rem-适配布局"><a href="#rem-适配布局" class="headerlink" title="rem 适配布局"></a>rem 适配布局</h4><h5 id="rem-基础"><a href="#rem-基础" class="headerlink" title="rem 基础"></a>rem 基础</h5><ul>
-<li><p>em 单位，在当前元素设置 font-size 时，以当前元素为参照；在当前元素未设置 font-size 时，以父元素为参照。</p>
-</li>
-<li><p>rem (root em) 是一个相对单位，类似于 em，em 是父元素字体大小，不同的是 rem 的基准是相对于 <strong>HTML 元素</strong>的字体大小。<br>比如，根元素 (HTML) 设置 <code>font-size: 12px</code>，非根元素设置 <code>width: 2rem</code>，则换成 px 表示就是 24px。</p>
-</li>
-<li><p>em 是相对于父元素的字体大小来说的，rem是相对于 HTML 元素的字体大小来说的。</p>
-</li>
+<li>em 单位，在当前元素设置 font-size 时，以当前元素为参照；在当前元素未设置 font-size 时，以父元素为参照。</li>
+<li>rem (root em) 是一个相对单位，类似于 em，em 是父元素字体大小，不同的是 rem 的基准是相对于 <strong>HTML 元素</strong>的字体大小。<br>比如，根元素 (HTML) 设置 <code>font-size: 12px</code>，非根元素设置 <code>width: 2rem</code>，则换成 px 表示就是 24px。</li>
+<li>em 是相对于父元素的字体大小来说的，rem是相对于 HTML 元素的字体大小来说的。</li>
 </ul>
 <h5 id="媒体查询"><a href="#媒体查询" class="headerlink" title="媒体查询"></a>媒体查询</h5><h6 id="什么是媒体查询？"><a href="#什么是媒体查询？" class="headerlink" title="什么是媒体查询？"></a>什么是媒体查询？</h6><p>媒体查询 (Media Query) 是 CSS3 的新语法。</p>
 <ul>
@@ -473,8 +470,7 @@
 
 
 
-<h6 id="引入资源"><a href="#引入资源" class="headerlink" title="引入资源"></a>引入资源</h6><p>当样式比较繁多的时候，我们可以针对不同的媒体使用不同的样式表。例如对于不同的屏幕尺寸，调用不同的 CSS 文件。</p>
-<p>语法规范：</p>
+<h6 id="引入资源"><a href="#引入资源" class="headerlink" title="引入资源"></a>引入资源</h6><p>当样式比较繁多的时候，我们可以针对不同的媒体使用不同的样式表。例如对于不同的屏幕尺寸，调用不同的 CSS 文件。<br>语法规范：</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;stylesheet&quot;</span> <span class="attr">media</span>=<span class="string">&quot;mediatype and|not|only (media feature)&quot;</span> <span class="attr">href</span>=<span class="string">&quot;mystylesheet.css&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 
@@ -491,7 +487,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/02/24/%E7%A7%BB%E5%8A%A8%E7%AB%AFWeb%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" data-id="cklku8ezr0008i101fifg4xtf" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/02/24/%E7%A7%BB%E5%8A%A8%E7%AB%AFWeb%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" data-id="cklkudkb50008lm01bhpf5mlm" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" rel="tag">移动端</a></li></ul>
