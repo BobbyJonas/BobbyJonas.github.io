@@ -64,6 +64,169 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-JS中的继承和原型链" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/03/08/JS%E4%B8%AD%E7%9A%84%E7%BB%A7%E6%89%BF%E5%92%8C%E5%8E%9F%E5%9E%8B%E9%93%BE/" class="article-date">
+  <time datetime="2021-03-08T13:45:58.769Z" itemprop="datePublished">2021-03-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/03/08/JS%E4%B8%AD%E7%9A%84%E7%BB%A7%E6%89%BF%E5%92%8C%E5%8E%9F%E5%9E%8B%E9%93%BE/">JS中的继承和原型链</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>作为 Js 新学习者，最近好好整理了下 Js 中的原型链和继承机制。结合文档和网课，我把这个话题相关的文字给码了下。</p>
+<h2 id="对象-Object"><a href="#对象-Object" class="headerlink" title="对象 Object"></a>对象 Object</h2><p>在了解继承和原型链之前，首先我们需要掌握一个对象 <code>Object</code> 是如何被创建的。</p>
+<p>总的来说，在 JavaScript 中我们有以下的几种方式来创建一个新的 <code>Object</code>。</p>
+<ul>
+<li>原生的 Object 方法</li>
+<li>对象字面量</li>
+<li>工厂模式</li>
+<li>构造函数</li>
+<li>Prototype 原型</li>
+</ul>
+<h4 id="原生-Object"><a href="#原生-Object" class="headerlink" title="原生 Object"></a>原生 Object</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用 Object 方式创建用户对象</span></span><br><span class="line"><span class="keyword">var</span> user = <span class="keyword">new</span> <span class="built_in">Object</span>();</span><br><span class="line"><span class="comment">// 定义对象</span></span><br><span class="line">user.name = <span class="string">&quot;张三&quot;</span>;</span><br><span class="line">user.pwd = <span class="string">&quot;123456&quot;</span>;</span><br><span class="line"><span class="comment">// 定义对象的方法</span></span><br><span class="line">user.showInfo = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">document</span>.write(<span class="built_in">this</span>.name + <span class="string">&quot;-&quot;</span> + <span class="built_in">this</span>.pwd + <span class="string">&quot;&lt;br /&gt;&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 调用对象</span></span><br><span class="line">user.showInfo();</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="对象字面量"><a href="#对象字面量" class="headerlink" title="对象字面量"></a>对象字面量</h4><ul>
+<li>对象定义的一种简写形式</li>
+<li>简化创建包含大量属性的对象的过程</li>
+<li>在为函数传递大量可选参数时，可考虑使用对象字面量</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用对象字面量方式，创建用户对象</span></span><br><span class="line"><span class="comment">// 事实上 var user = &#123;&#125;; </span></span><br><span class="line"><span class="comment">// 即为 var user = new Object();</span></span><br><span class="line"><span class="keyword">var</span> user = &#123;</span><br><span class="line">  name: <span class="string">&quot;张三&quot;</span>, </span><br><span class="line">  pwd: <span class="string">&quot;123456&quot;</span>,</span><br><span class="line">  showInfo: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">document</span>.write(<span class="built_in">this</span>.name + <span class="string">&quot;-&quot;</span> + <span class="built_in">this</span>.pwd + <span class="string">&quot;&lt;br /&gt;&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除此之外，</p>
+<p><code>var arr = []</code> 其实是 <code>var arr = new Array()</code> 的语法糖，</p>
+<p><code>function Foo() &#123;...&#125;</code> 其实是 <code>var Foo = new Function &#123;...&#125;</code> 的语法糖</p>
+<h4 id="工厂模式"><a href="#工厂模式" class="headerlink" title="工厂模式"></a>工厂模式</h4><ul>
+<li>软件工程领域的一种设计模式</li>
+<li>抽象了创建对象的过程</li>
+<li>通过函数<strong>封装</strong>创建对象的细节</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用工厂模式创建用户对象</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createUser</span>(<span class="params">name, pwd</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> user = <span class="keyword">new</span> <span class="built_in">Object</span>();</span><br><span class="line">  <span class="comment">// 定义对象的属性</span></span><br><span class="line">  user.name = name;</span><br><span class="line">  user.pwd = pwd;</span><br><span class="line">  <span class="comment">// 定义对象的方法</span></span><br><span class="line">  user.showInfo = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">document</span>.write(<span class="built_in">this</span>.name + <span class="string">&quot;-&quot;</span> + <span class="built_in">this</span>.pwd + <span class="string">&quot;&lt;br /&gt;&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> user;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建用户对象</span></span><br><span class="line"><span class="comment">// 弊端1: 看不出来数据类型</span></span><br><span class="line"><span class="keyword">var</span> user1 = createUser(<span class="string">&quot;张三&quot;</span>, <span class="string">&quot;123456&quot;</span>);</span><br><span class="line"><span class="keyword">var</span> user2 = createUser(<span class="string">&quot;李四&quot;</span>, <span class="string">&quot;654321&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用构造函数方式创建用户对象</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">User</span>(<span class="params">name, pwd</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 定义对象的属性</span></span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.pwd = pwd;</span><br><span class="line">  <span class="comment">// 定义对象的方法</span></span><br><span class="line">  <span class="built_in">this</span>.showInfo = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">document</span>.write(<span class="built_in">this</span>.name + <span class="string">&quot;-&quot;</span> + <span class="built_in">this</span>.pwd + <span class="string">&quot;&lt;br /&gt;&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 构造函数这里默认有一个 return this; 只不过我们不写了</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建用户对象</span></span><br><span class="line"><span class="comment">// 弊端1: 看不出数据类型</span></span><br><span class="line"><span class="keyword">var</span> user1 = <span class="keyword">new</span> User(<span class="string">&quot;张三&quot;</span>, <span class="string">&quot;123456&quot;</span>);</span><br><span class="line"><span class="keyword">var</span> user2 = <span class="keyword">new</span> User(<span class="string">&quot;李四&quot;</span>, <span class="string">&quot;654321&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="原型-prototype"><a href="#原型-prototype" class="headerlink" title="原型 prototype"></a>原型 prototype</h4><ul>
+<li>每个函数都有一个 prototype (原型) 属性</li>
+<li>其是一个指针，指向一个对象 (Object)</li>
+<li>这个对象的用途是包含可以由特定类型的所有实例的属性和方法</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用构造函数方式创建用户对象</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">User</span>(<span class="params">name, pwd</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 定义对象的属性</span></span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.pwd = pwd;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 原型对象</span></span><br><span class="line">User.prototype.showInfo = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">document</span>.write(<span class="built_in">this</span>.name + <span class="string">&quot;-&quot;</span> + <span class="built_in">this</span>.pwd + <span class="string">&quot;&lt;br /&gt;&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建用户对象(同上)</span></span><br><span class="line"><span class="comment">// 弊端1: 看不出数据类型</span></span><br><span class="line"><span class="keyword">var</span> user1 = <span class="keyword">new</span> User(<span class="string">&quot;张三&quot;</span>, <span class="string">&quot;123456&quot;</span>);</span><br><span class="line"><span class="keyword">var</span> user2 = <span class="keyword">new</span> User(<span class="string">&quot;李四&quot;</span>, <span class="string">&quot;654321&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>上述用构造函数+prototype这种方法构造对象，也叫做用<strong>混合方式</strong>构造对象，即</p>
+<ul>
+<li>构造函数：来写函数的属性</li>
+<li>原型 prototype：来写函数的方法</li>
+</ul>
+<h2 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h2><h3 id="关于-prototype-和继承"><a href="#关于-prototype-和继承" class="headerlink" title="关于 prototype 和继承"></a>关于 prototype 和继承</h3><p>上一节里我们用到了 prototype，那么 prototype 到底是什么呢？</p>
+<ul>
+<li>prototype 属性包含一个对象 (prototype 对象)</li>
+<li>所有实例对象需要<strong>共享的属性和方法</strong>，都放在这个对象里</li>
+<li>实例对象一旦创建，将自动引用 (共享) prototype 对象的属性和方法</li>
+<li>prototype 对象好像是实例对象的原型，而实例对象则好像<strong>“继承”</strong>了 prototype 对象一样</li>
+</ul>
+<h3 id="几种继承的方式"><a href="#几种继承的方式" class="headerlink" title="几种继承的方式"></a>几种继承的方式</h3><h4 id="更改-prototype-指向"><a href="#更改-prototype-指向" class="headerlink" title="更改 prototype 指向"></a>更改 prototype 指向</h4><p>常见的方法</p>
+<ol>
+<li><code>Student.prototype = new Person()</code></li>
+<li><code>Student</code> 的 <code>prototype</code> 指向一个 <code>Person</code> 的实例，所有“学生”的实例，就能继承 <code>Person</code> 了</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.foot = <span class="number">2</span>;</span><br><span class="line">  <span class="built_in">this</span>.head = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, no</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.no = no;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 通过 prototype 属性实现继承</span></span><br><span class="line">Student.prototype = <span class="keyword">new</span> Person();</span><br><span class="line"><span class="comment">// Student 的 prototype 属性指向一个 Person 实例的写法，</span></span><br><span class="line"><span class="comment">// 相当于完全删除了 prototype 原先的值，赋了一个新值</span></span><br><span class="line"></span><br><span class="line">Student.prototype.constructor = Student;</span><br><span class="line"><span class="comment">// 每个实例的 prototype 对象都有一个 constructor 属性</span></span><br><span class="line"><span class="comment">// 直接通过原型链继承后，会发生“继承链紊乱”，需要手动理顺</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>注意</strong></p>
+<p>如果替换了 <code>prototype</code> 对象，即 <code>o.prototype = &#123;&#125;;</code></p>
+<p>要为新的 <code>prototype</code> 对象加上 <code>constuctor</code> 属性，并将这个属性指回原来的构造函数，即 <code>o.prototype.constructor = o;</code></p>
+<h4 id="直接继承-prototype"><a href="#直接继承-prototype" class="headerlink" title="直接继承 prototype"></a>直接继承 prototype</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">Person.prototype.foot = <span class="number">2</span>;</span><br><span class="line">Person.prototype.head = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, no</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.no = no;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 通过直接继承 prototype 属性来继承</span></span><br><span class="line">Student.prototype = Person.prototype</span><br><span class="line"><span class="comment">// 手动理顺一下继承链</span></span><br><span class="line">Student.prototype.constructor = Student;</span><br></pre></td></tr></table></figure>
+
+<p>这样继承的<strong>优点</strong>在于效率比较高 (不用执行和建立 Person 的实例了)，</p>
+<p>而<strong>缺点</strong>是 <code>Student.prototype</code> 和 <code>Person.prototype</code> 现在指向了同一个对象，任何对 <code>Student.prototype</code> 的修改，都会反映到 <code>Person.prototype</code>。</p>
+<h4 id="利用空对象作为中介"><a href="#利用空对象作为中介" class="headerlink" title="利用空对象作为中介"></a>利用空对象作为中介</h4><p>为了解决上述更改 <code>Student.prototype</code> 都会反映到 <code>Person.prototype</code> 的问题，我们可以利用空对象作为中介来进行继承。其优点在于：</p>
+<ul>
+<li>空对象，几乎不占用内存</li>
+<li>修改 <code>Student</code> 的 <code>prototype</code> 对象，不会影响到 <code>Person</code> 的 <code>prototype</code> 对象</li>
+<li>可以封装成函数</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// F 为空对象，几乎不占用内存</span></span><br><span class="line"><span class="keyword">var</span> F = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;&#125;;</span><br><span class="line">F.prototype = Person.prototype;</span><br><span class="line">Student.prototype = <span class="keyword">new</span> F();</span><br><span class="line"><span class="comment">// 由于 Student 的 constructor 是 Person，则还需要手动理顺继承链</span></span><br><span class="line"><span class="keyword">var</span> stu1 = <span class="keyword">new</span> Student(<span class="string">&quot;张三&quot;</span>, <span class="string">&quot;s001&quot;</span>);</span><br><span class="line">Student.prototype.constructor = Student;</span><br></pre></td></tr></table></figure>
+
+<p>将上述代码封装成一个函数，即</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">extend</span>(<span class="params">Child, Parent</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> F = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">  F.prototype = Parent.prototype;</span><br><span class="line">  Child.prototype = <span class="keyword">new</span> F();</span><br><span class="line">  Child.prototype.constructor = Child;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>(有 ES6 的 <code>extends</code> 那味儿了)</p>
+<p>等到需要用到继承的时候，我们便可以直接通过 <code>extend(Student, Person)</code> 来实现了，省去了不少工夫。</p>
+<h4 id="构造函数绑定来进行继承"><a href="#构造函数绑定来进行继承" class="headerlink" title="构造函数绑定来进行继承"></a>构造函数绑定来进行继承</h4><h5 id="为什么要绑定？"><a href="#为什么要绑定？" class="headerlink" title="为什么要绑定？"></a>为什么要绑定？</h5><p>假设有以下代码，<strong>提问</strong>下面的 <code>alert</code> 会弹出什么结果？</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.foot = <span class="number">2</span>;</span><br><span class="line">  <span class="built_in">this</span>.head = <span class="number">1</span>;</span><br><span class="line">  <span class="built_in">this</span>.favorColor = [<span class="string">&quot;red&quot;</span>, <span class="string">&quot;yellow&quot;</span>];  <span class="comment">// **</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, no</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.no = no;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Student.prototype = <span class="keyword">new</span> Person();</span><br><span class="line"><span class="keyword">var</span> stu1 = <span class="keyword">new</span> Student(<span class="string">&quot;张三&quot;</span>, <span class="string">&quot;s001&quot;</span>);</span><br><span class="line">stu1.favorColor.push(<span class="string">&quot;blue&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以下代码弹出什么结果？</span></span><br><span class="line"><span class="keyword">var</span> stu2 = <span class="keyword">new</span> Student(<span class="string">&quot;李四&quot;</span>, <span class="string">&quot;s002&quot;</span>);</span><br><span class="line">alert(stu2.favorColor);</span><br></pre></td></tr></table></figure>
+
+<p><strong>答案为</strong> <code>red, yellow, blue</code>，而不是 <code>red, yellow</code>，为什么会这样呢？</p>
+<p>原因是在这里的所有实例即 <code>stu1</code>、<code>stu2</code>，共享了父函数的<strong>非基本类型</strong>属性，如<em>数组</em>或<em>对象</em>，一个实例对属性的修改会影响所有实例。</p>
+<h5 id="构造函数绑定"><a href="#构造函数绑定" class="headerlink" title="构造函数绑定"></a>构造函数绑定</h5><ul>
+<li>在子类型构造函数的内部调用父类型构造函数</li>
+<li>通过 <code>call()</code> 或 <code>apply()</code> 方法</li>
+</ul>
+<p>代码如下</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.foot = <span class="number">2</span>;</span><br><span class="line">  <span class="built_in">this</span>.head = <span class="number">1</span>;</span><br><span class="line">  <span class="built_in">this</span>.favorColor = [<span class="string">&quot;red&quot;</span>, <span class="string">&quot;yellow&quot;</span>]; </span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, no</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 将父对象的构造函数，绑定在子对象上</span></span><br><span class="line">  <span class="comment">// 借调父类的构造函数</span></span><br><span class="line">  Person.call(<span class="built_in">this</span>);</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.no = no;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> stu1 = <span class="keyword">new</span> Student(<span class="string">&quot;张三&quot;</span>, <span class="string">&quot;s001&quot;</span>);</span><br><span class="line">stu1.favorColor.push(<span class="string">&quot;blue&quot;</span>);</span><br><span class="line">alert(stu1.foot);</span><br><span class="line">alert(stu1.head);</span><br><span class="line">alert(stu1.favorColor);  <span class="comment">// red, yellow, blue</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> stu2 = <span class="keyword">new</span> Student(<span class="string">&quot;李四&quot;</span>, <span class="string">&quot;s002&quot;</span>);</span><br><span class="line">alert(stu2.favorColor);  <span class="comment">// red, yellow</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="组合继承"><a href="#组合继承" class="headerlink" title="组合继承"></a>组合继承</h4><p>上述代码只能实现属性的继承，那么如何对方法也进行继承呢？我们可以用组合继承的方法。</p>
+<p>组合继承也叫伪经典继承：</p>
+<ul>
+<li>其将原型链继承和构造函数继承组合在一块</li>
+<li>原型链实现对原型属性和方法的继承</li>
+<li>借用构造函数实现对实例属性的继承</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.foot = <span class="number">2</span>;</span><br><span class="line">  <span class="built_in">this</span>.head = <span class="number">1</span>;</span><br><span class="line">  <span class="built_in">this</span>.favorColor = [<span class="string">&quot;red&quot;</span>, <span class="string">&quot;yellow&quot;</span>]; </span><br><span class="line">&#125;</span><br><span class="line">Person.prototype.sayColor = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  alert(<span class="string">&quot;Hello, 我最爱的颜色是: &quot;</span> + <span class="built_in">this</span>.favorColor);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, no</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 使用构造函数绑定，实现了对父类属性的继承</span></span><br><span class="line">  Person.call(<span class="built_in">this</span>);</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.no = no;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//原型链继承: 继承对象的属性和方法</span></span><br><span class="line">Student.prototype = <span class="keyword">new</span> Person();</span><br><span class="line">Student.prototype.constructor = Student;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="拷贝继承"><a href="#拷贝继承" class="headerlink" title="拷贝继承"></a>拷贝继承</h4><p>通过对父类原型的属性遍历拷贝，也能把父类的属性放到子类上。简单且暴力。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name, no</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">this</span>.name = name;</span><br><span class="line">  <span class="built_in">this</span>.no = no;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 拷贝继承</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">extend2</span>(<span class="params">Child, Parent</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> p = Parent.prototype;</span><br><span class="line">  <span class="keyword">var</span> c = Child.prototype;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i <span class="keyword">in</span> p) &#123;</span><br><span class="line">    c[i] = p[i];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">extend2(Student, Person);</span><br><span class="line"><span class="keyword">var</span> stu1 = <span class="keyword">new</span> Student(<span class="string">&quot;张三&quot;</span>, <span class="string">&quot;s001&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="原型链"><a href="#原型链" class="headerlink" title="原型链"></a>原型链</h2><h3 id="原型规则"><a href="#原型规则" class="headerlink" title="原型规则"></a>原型规则</h3><p>了解以上继承知识之后，我们便能将原型链的概念好好梳理下了。原型有以下几点规则：</p>
+<ol>
+<li>所有的<strong>引用类型</strong>，即<em>数组</em>、<em>对象</em>、<em>函数</em>，都具有对象特性，即可自由扩展属性 (除了 <code>null</code>)。</li>
+<li>所有的<strong>引用类型</strong>，都有一个 <code>__proto__</code> 属性，属性值是一个普通的对象。</li>
+<li>所有的<strong>函数</strong>，都有一个 <code>prototype</code> 属性，属性值也是一个普通的对象。</li>
+<li>所有的<strong>引用类型</strong>，<code>__proto__</code> 属性值都指向它的<em>构造函数</em>的 <code>prototype</code> 属性值。</li>
+<li>当试图得到一个<strong>对象</strong>的某个属性时，如果这个对象本身没有这个属性，那么会去它的 <code>__proto__</code> (即它的构造函数的 <code>prototype</code>) 中寻找。</li>
+<li>这样为了得到某个属性，沿着其 <code>__proto__</code> 属性进行寻找的链条，我们叫做<strong>原型链</strong>。</li>
+</ol>
+<h3 id="instanceof"><a href="#instanceof" class="headerlink" title="instanceof"></a>instanceof</h3><p><code>f instanceof Foo</code> 可用来判断元素 <code>f</code> 是否为 <code>Foo</code> 的原型，</p>
+<p>其判断逻辑就是：对 <code>f</code> 的 <code>__proto__</code> 一层一层往上，看是否能对应到 <code>Foo.prototype</code>，即</p>
+<p><code>f.__proto__ = Foo.prototype</code> 或 <code>f.__proto__.__proto__... = Foo.prototype</code></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://bobbyjonas.github.io/2021/03/08/JS%E4%B8%AD%E7%9A%84%E7%BB%A7%E6%89%BF%E5%92%8C%E5%8E%9F%E5%9E%8B%E9%93%BE/" data-id="ckm7g5lwy00005ii3dmw64cwk" class="article-share-link">分享</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8E%9F%E5%9E%8B%E9%93%BE/" rel="tag">原型链</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BB%A7%E6%89%BF/" rel="tag">继承</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-移动端Web开发笔记" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2021/02/24/%E7%A7%BB%E5%8A%A8%E7%AB%AFWeb%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" class="article-date">
@@ -474,7 +637,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/02/24/%E7%A7%BB%E5%8A%A8%E7%AB%AFWeb%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" data-id="cklkukjrk0008r0010eqdh7nq" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/02/24/%E7%A7%BB%E5%8A%A8%E7%AB%AFWeb%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" data-id="ckm7g5lxg000a5ii332back1s" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" rel="tag">移动端</a></li></ul>
@@ -605,7 +768,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/01/24/nuxt.js%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/" data-id="cklkukjrb0001r001h3nh9fyu" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/01/24/nuxt.js%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/" data-id="ckm7g5lx600015ii3gdsw09uw" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nuxt/" rel="tag">nuxt</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -765,7 +928,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/12/28/vuex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-id="cklkukjrc0002r0018hufdbf9" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/12/28/vuex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-id="ckm7g5lxa00045ii3dyrz69xx" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vuex/" rel="tag">vuex</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -813,7 +976,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/23/%E5%AE%9E%E7%8E%B0table%E5%9C%A8%E9%A1%B5%E9%9D%A2%E4%B8%AD%E5%B1%85%E4%B8%AD%E6%98%BE%E7%A4%BA/" data-id="cklkukjrh0005r0014scv9xt5" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/23/%E5%AE%9E%E7%8E%B0table%E5%9C%A8%E9%A1%B5%E9%9D%A2%E4%B8%AD%E5%B1%85%E4%B8%AD%E6%98%BE%E7%A4%BA/" data-id="ckm7g5lxd00075ii3ez8g6ay3" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/table/" rel="tag">table</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -882,7 +1045,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/16/%E5%88%87%E6%8D%A2node%E7%9A%84%E7%89%88%E6%9C%AC/" data-id="cklkukjrf0004r001cm793yzy" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/16/%E5%88%87%E6%8D%A2node%E7%9A%84%E7%89%88%E6%9C%AC/" data-id="ckm7g5lxb00055ii32nxz9xl8" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -963,7 +1126,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/13/%E7%94%A8hexo%E5%88%9B%E5%BB%BA%E5%8D%9A%E5%AE%A2/" data-id="cklkukjri0006r001fxheb8k3" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/13/%E7%94%A8hexo%E5%88%9B%E5%BB%BA%E5%8D%9A%E5%AE%A2/" data-id="ckm7g5lxe00085ii3157rabib" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/blog/" rel="tag">blog</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/markdown/" rel="tag">markdown</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -1014,7 +1177,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/13/hello-world/" data-id="cklkukjr60000r001e4ry2a8h" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/13/hello-world/" data-id="ckm7g5lx900035ii3fy42gbns" class="article-share-link">分享</a>
       
       
     </footer>
@@ -1037,7 +1200,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blog/" rel="tag">blog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/markdown/" rel="tag">markdown</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nuxt/" rel="tag">nuxt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/table/" rel="tag">table</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuex/" rel="tag">vuex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" rel="tag">移动端</a></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blog/" rel="tag">blog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/markdown/" rel="tag">markdown</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nuxt/" rel="tag">nuxt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/table/" rel="tag">table</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuex/" rel="tag">vuex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8E%9F%E5%9E%8B%E9%93%BE/" rel="tag">原型链</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" rel="tag">移动端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%A7%E6%89%BF/" rel="tag">继承</a></li></ul>
     </div>
   </div>
 
@@ -1047,7 +1210,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Web%E5%BC%80%E5%8F%91/" style="font-size: 10px;">Web开发</a> <a href="/tags/blog/" style="font-size: 10px;">blog</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/nuxt/" style="font-size: 10px;">nuxt</a> <a href="/tags/table/" style="font-size: 10px;">table</a> <a href="/tags/vue/" style="font-size: 15px;">vue</a> <a href="/tags/vuex/" style="font-size: 10px;">vuex</a> <a href="/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 20px;">前端</a> <a href="/tags/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" style="font-size: 10px;">移动端</a>
+      <a href="/tags/JavaScript/" style="font-size: 10px;">JavaScript</a> <a href="/tags/Web%E5%BC%80%E5%8F%91/" style="font-size: 10px;">Web开发</a> <a href="/tags/blog/" style="font-size: 10px;">blog</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/nuxt/" style="font-size: 10px;">nuxt</a> <a href="/tags/table/" style="font-size: 10px;">table</a> <a href="/tags/vue/" style="font-size: 15px;">vue</a> <a href="/tags/vuex/" style="font-size: 10px;">vuex</a> <a href="/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 20px;">前端</a> <a href="/tags/%E5%8E%9F%E5%9E%8B%E9%93%BE/" style="font-size: 10px;">原型链</a> <a href="/tags/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" style="font-size: 10px;">移动端</a> <a href="/tags/%E7%BB%A7%E6%89%BF/" style="font-size: 10px;">继承</a>
     </div>
   </div>
 
@@ -1056,7 +1219,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">二月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">十二月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">十一月 2020</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">二月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">十二月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">十一月 2020</a></li></ul>
     </div>
   </div>
 
@@ -1067,6 +1230,10 @@
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2021/03/08/JS%E4%B8%AD%E7%9A%84%E7%BB%A7%E6%89%BF%E5%92%8C%E5%8E%9F%E5%9E%8B%E9%93%BE/">JS中的继承和原型链</a>
+          </li>
         
           <li>
             <a href="/2021/02/24/%E7%A7%BB%E5%8A%A8%E7%AB%AFWeb%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/">移动端Web开发笔记</a>
@@ -1082,10 +1249,6 @@
         
           <li>
             <a href="/2020/11/23/%E5%AE%9E%E7%8E%B0table%E5%9C%A8%E9%A1%B5%E9%9D%A2%E4%B8%AD%E5%B1%85%E4%B8%AD%E6%98%BE%E7%A4%BA/">实现table在页面中居中显示</a>
-          </li>
-        
-          <li>
-            <a href="/2020/11/16/%E5%88%87%E6%8D%A2node%E7%9A%84%E7%89%88%E6%9C%AC/">切换不同版本的node</a>
           </li>
         
       </ul>
