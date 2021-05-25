@@ -15,7 +15,7 @@
 <meta property="og:description" content="引言之前在学习 JS 中 Promise 的时候，随便找了一个某厂相关的面试题来练手。 找到的题目很简单，要求是用 Promise 来实现红绿灯的功能，无限循环。但当看到那个样例代码的时候，我陷入了深深的沉思： 1234567891011121314151617181920212223242526272829function light() &amp;#123;  new Promise((resolve">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-05-25T04:20:08.221Z">
-<meta property="article:modified_time" content="2021-05-25T06:51:03.396Z">
+<meta property="article:modified_time" content="2021-05-25T07:49:49.939Z">
 <meta property="article:author" content="Bob">
 <meta property="article:tag" content="数据结构">
 <meta property="article:tag" content="栈">
@@ -98,21 +98,10 @@
 <p>无限地调用自己，短期内看上去相当可行。但运行时间长的话，确定不会<strong>栈溢出</strong>或者起码浪费资源吗？</p>
 <p>我内心里一直有上述这样的疑问，直到我了解到了“尾调用” (Tail Calls) 这一机制。</p>
 <h3 id="尾调用-amp-尾递归"><a href="#尾调用-amp-尾递归" class="headerlink" title="尾调用 &amp; 尾递归"></a>尾调用 &amp; 尾递归</h3><h4 id="为什么需要尾调用优化"><a href="#为什么需要尾调用优化" class="headerlink" title="为什么需要尾调用优化"></a>为什么需要尾调用优化</h4><p>为了解决递归时调用栈溢出的问题，除了把递归函数改为<strong>迭代</strong>之外，改为<strong>尾递归</strong>的形式也可以解决。</p>
-<blockquote>
-<blockquote>
-<p>在 Node 6、Node 7 中可以使用命令行参数 <code>--harmony-tailcalls</code> 开启尾递归优化功能。但是这个特性已经被 V8 移除了，对应的 Node 8 之后的版本都已经没有了尾递归优化功能。</p>
-<blockquote>
-</blockquote>
-<p>在 Chrome 之前的某些版本确实可以通过 <code>chrome://flags/#enable-javascript-harmony</code> 开启，但是也已经被移除了。</p>
-<blockquote>
-</blockquote>
-<p>因为尾递归优化会破坏函数的调用栈信息，TC39 也正在寻找新的 JS 语法来显式指明需要使用尾递归优化。</p>
-</blockquote>
+<h5 id="注意⚠️"><a href="#注意⚠️" class="headerlink" title="注意⚠️"></a>注意⚠️</h5><p>在 Node 6、Node 7 中可以使用命令行参数 <code>--harmony-tailcalls</code> 开启尾递归优化功能。但是这个特性已经被 V8 移除了，对应的 Node 8 之后的版本都已经没有了尾递归优化功能。在 Chrome 之前的某些版本确实可以通过 <code>chrome://flags/#enable-javascript-harmony</code> 开启，但是也已经被移除了。因为尾递归优化会破坏函数的调用栈信息，TC39 也正在寻找新的 JS 语法来显式指明需要使用尾递归优化。</p>
 <p>事实上，在 JavaScript 世界中，尾调用只短暂地被 Node.js 支持过，但后来都由于技术原因而被废弃。到目前为止，只有 Safari 这一浏览器支持“尾调用优化” (Tail Call Elimination)，而无论是 Chrome 中的 V8、还是 Node.js 都还不支持。2016 年的 TC39 提案中，有关于这一点的公开讨论，一些开发人员仍强烈希望在 JavaScript 中支持 PCE。</p>
-<p>尾调用优化目前还是 Stage 0 Draft 阶段，但是我们有理由相信在不久的将来这个一定会进入 ES 标准。</p>
-<p>但即使目前大部分浏览器没有对尾递归 (尾调用) 做优化、依然会导致栈溢出，了解尾递归的优化方式还是很有价值的。</p>
-</blockquote>
-<p>当函数 <code>func1</code> 的最后一个动作是调用函数 <code>func2</code> 时，那么对函数 <code>func2</code> 的调用形式就是<strong>尾调用</strong>。例如：</p>
+<p>尾调用优化目前还是 Stage 0 Draft 阶段，但是我们有理由相信在不久的将来这个一定会进入 ES 标准。即使目前大部分浏览器没有对尾递归 (尾调用) 做优化、依然会导致栈溢出，了解尾递归的优化方式还是很有价值的。</p>
+<h5 id="回归正文"><a href="#回归正文" class="headerlink" title="回归正文"></a>回归正文</h5><p>当函数 <code>func1</code> 的最后一个动作是调用函数 <code>func2</code> 时，那么对函数 <code>func2</code> 的调用形式就是<strong>尾调用</strong>。例如：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> func2 = <span class="function">(<span class="params">a</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> b = a + <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">return</span> b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> func1 = <span class="function">(<span class="params">x</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> y = x + <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">return</span> func2(y);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> result = func1(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
 
 
@@ -148,21 +137,21 @@
 
 
 
-<h4 id="然而"><a href="#然而" class="headerlink" title="然而"></a>然而</h4><p>其实事实上，尾调用只是给数据处理提供一个新的方式，而尾递归通常都能被写成迭代的方式。</p>
-<p>但是在目前还不支持尾调用的 V8、Node.js 等环境 (可以通过<a target="_blank" rel="noopener" href="http://kangax.github.io/compat-table/es6/#test-proper_tail_calls_%28tail_call_optimisation%29">这个网站</a>查看”尾调用优化“的支持情况)，我们可以将递归改写成循环来实现。</p>
-<blockquote>
-<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/47155064">https://zhuanlan.zhihu.com/p/47155064</a></p>
-<p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Tail_call#Through_trampolining">Trampoline</a> 是对尾递归函数进行处理的一种技巧。我们需要先把上面的 <code>sum</code> 函数改造一下，再由 <code>trampoline</code> 函数处理即可：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> sum0 = <span class="function">(<span class="params">n, prevSum = <span class="number">0</span></span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span> n + prevSum;</span><br><span class="line">  <span class="keyword">return</span> <span class="function">() =&gt;</span> sum0(n-<span class="number">1</span>, n + prevSum)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> trampoline = <span class="function"><span class="params">f</span> =&gt;</span> <span class="function">(<span class="params">...args</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> result = f(...args);</span><br><span class="line">  <span class="keyword">while</span> (<span class="keyword">typeof</span> result === <span class="string">&#x27;function&#x27;</span>) &#123;</span><br><span class="line">    result = result();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> sum = trampoline(sum0);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1000000</span>));   <span class="comment">// 不会栈溢出</span></span><br></pre></td></tr></table></figure>
+<h4 id="然而"><a href="#然而" class="headerlink" title="然而"></a>然而</h4><p>其实，尾调用就是给数据处理提供一个新的方式。</p>
+<p>而递归通常能被写成迭代的方式，因为在目前的 V8、Node.js 等环境都<strong>还不支持尾调用</strong> (可以通过<a target="_blank" rel="noopener" href="http://kangax.github.io/compat-table/es6/#test-proper_tail_calls_%28tail_call_optimisation%29">这个网站</a>查看”尾调用优化“的支持情况)，我们可以通过将尾递归改写成循环，来实现节省空间的目的。</p>
+<p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Tail_call#Through_trampolining">Trampoline</a> 是对尾递归函数进行处理的一种技巧。对于一段累加的代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> sum = <span class="function">(<span class="params">n, prevSum = <span class="number">0</span></span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span> n + prevSum;</span><br><span class="line">  <span class="keyword">return</span> sum(n-<span class="number">1</span>, n + prevSum)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>可以看到，这里实际上就是把原本的递归改为了迭代，这样就不会有栈溢出的问题啦。</p>
-</blockquote>
-<p>虽然递归理论上都能改写为迭代，但有些场景下使用递归可能会更加直观，如果它能被转为”尾递归“，你就可以直接用 <code>trampoline</code> 函数进行处理，或者把它改写成迭代的方法. </p>
+<p>我们可以先把上面的 <code>sum</code> 函数改造一下，再由 <code>trampoline</code> 函数处理即可：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> sum0 = <span class="function">(<span class="params">n, prevSum = <span class="number">0</span></span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span> n + prevSum;</span><br><span class="line">  <span class="keyword">return</span> <span class="function">() =&gt;</span> sum0(n-<span class="number">1</span>, n + prevSum)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> trampoline = <span class="function"><span class="params">f</span> =&gt;</span> <span class="function">(<span class="params">...args</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> result = f(...args);</span><br><span class="line">  <span class="keyword">while</span> (<span class="keyword">typeof</span> result === <span class="string">&#x27;function&#x27;</span>) &#123;</span><br><span class="line">    result = result();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> sum = trampoline(sum0);</span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1000000</span>));     <span class="comment">// 不会栈溢出</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到，这里实际上就是把原本的递归改成了迭代，这样就不会有栈溢出的问题啦。</p>
+<p>虽然递归理论上都能改写为迭代，但有些场景下使用递归可能会更加直观。如果一个递归能被转为”尾递归“，你就可以间接地用 <code>trampoline</code> 函数进行处理，或者把它改写成迭代的方法。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/05/25/%E6%B5%85%E8%B0%88%E5%B0%BE%E9%80%92%E5%BD%92%E5%92%8C%E5%B0%BE%E8%B0%83%E7%94%A8/" data-id="ckp3pcd72000by9s66kps1b1h" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/05/25/%E6%B5%85%E8%B0%88%E5%B0%BE%E9%80%92%E5%BD%92%E5%92%8C%E5%B0%BE%E8%B0%83%E7%94%A8/" data-id="ckp3qnmet000bpds6b9m9flmt" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag">数据结构</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%A0%88/" rel="tag">栈</a></li></ul>
