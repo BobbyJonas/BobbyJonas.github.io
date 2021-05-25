@@ -64,6 +64,112 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-浅谈尾递归和尾调用" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/05/25/%E6%B5%85%E8%B0%88%E5%B0%BE%E9%80%92%E5%BD%92%E5%92%8C%E5%B0%BE%E8%B0%83%E7%94%A8/" class="article-date">
+  <time datetime="2021-05-25T04:20:08.221Z" itemprop="datePublished">2021-05-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/05/25/%E6%B5%85%E8%B0%88%E5%B0%BE%E9%80%92%E5%BD%92%E5%92%8C%E5%B0%BE%E8%B0%83%E7%94%A8/">浅谈尾递归和尾调用</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>之前在学习 JS 中 Promise 的时候，随便找了一个某厂相关的面试题来练手。</p>
+<p>找到的题目很简单，要求是用 Promise 来实现红绿灯的功能，无限循环。但当看到那个样例代码的时候，我陷入了深深的沉思：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">light</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">&#x27;红&#x27;</span>);</span><br><span class="line">      resolve();</span><br><span class="line">    &#125;, <span class="number">1000</span>);</span><br><span class="line">  &#125;)</span><br><span class="line">    .then(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">          <span class="built_in">console</span>.log(<span class="string">&#x27;绿&#x27;</span>);</span><br><span class="line">          resolve();</span><br><span class="line">        &#125;, <span class="number">1000</span>);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;)</span><br><span class="line">    .then(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">          <span class="built_in">console</span>.log(<span class="string">&#x27;黄&#x27;</span>);</span><br><span class="line">          resolve();</span><br><span class="line">        &#125;, <span class="number">1000</span>);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;)</span><br><span class="line">    .then(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> light();    <span class="comment">// ???????????????????</span></span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">light();</span><br></pre></td></tr></table></figure>
+
+<p>这个过程其实是简单而且优雅的，但是最后那一句 <code>return light()</code> 是什么鬼！</p>
+<p>无限地调用自己，短期内看上去相当可行。但运行时间长的话，确定不会<strong>栈溢出</strong>或者起码浪费资源吗？</p>
+<p>我内心里一直有上述这样的疑问，直到我了解到了“尾调用” (Tail Calls) 这一机制。</p>
+<h3 id="尾调用-amp-尾递归"><a href="#尾调用-amp-尾递归" class="headerlink" title="尾调用 &amp; 尾递归"></a>尾调用 &amp; 尾递归</h3><h4 id="为什么需要尾调用优化"><a href="#为什么需要尾调用优化" class="headerlink" title="为什么需要尾调用优化"></a>为什么需要尾调用优化</h4><p>为了解决递归时调用栈溢出的问题，除了把递归函数改为<strong>迭代</strong>之外，改为<strong>尾递归</strong>的形式也可以解决。</p>
+<blockquote>
+<blockquote>
+<p>在 Node 6、Node 7 中可以使用命令行参数 <code>--harmony-tailcalls</code> 开启尾递归优化功能。但是这个特性已经被 V8 移除了，对应的 Node 8 之后的版本都已经没有了尾递归优化功能。</p>
+<blockquote>
+</blockquote>
+<p>在 Chrome 之前的某些版本确实可以通过 <code>chrome://flags/#enable-javascript-harmony</code> 开启，但是也已经被移除了。</p>
+<blockquote>
+</blockquote>
+<p>因为尾递归优化会破坏函数的调用栈信息，TC39 也正在寻找新的 JS 语法来显式指明需要使用尾递归优化。</p>
+</blockquote>
+<p>事实上，在 JavaScript 世界中，尾调用只短暂地被 Node.js 支持过，但后来都由于技术原因而被废弃。到目前为止，只有 Safari 这一浏览器支持“尾调用优化” (Tail Call Elimination)，而无论是 Chrome 中的 V8、还是 Node.js 都还不支持。2016 年的 TC39 提案中，有关于这一点的公开讨论，一些开发人员仍强烈希望在 JavaScript 中支持 PCE。</p>
+<p>尾调用优化目前还是 Stage 0 Draft 阶段，但是我们有理由相信在不久的将来这个一定会进入 ES 标准。</p>
+<p>但即使目前大部分浏览器没有对尾递归 (尾调用) 做优化、依然会导致栈溢出，了解尾递归的优化方式还是很有价值的。</p>
+</blockquote>
+<p>当函数 <code>func1</code> 的最后一个动作是调用函数 <code>func2</code> 时，那么对函数 <code>func2</code> 的调用形式就是<strong>尾调用</strong>。例如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> func2 = <span class="function">(<span class="params">a</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> b = a + <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">return</span> b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> func1 = <span class="function">(<span class="params">x</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> y = x + <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">return</span> func2(y);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> result = func1(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>在<strong>尾调用优化</strong>的模式下，执行该段代码的步骤就是：</p>
+<ol>
+<li><p>执行函数 <code>func1(1)</code>，将其压入调用栈 (call stack) 中。</p>
+</li>
+<li><p>先运行完 <code>func1</code> 的主体部分，在执行到 <code>return func2(y)</code> 时，</p>
+<p><code>func1</code> 的调用即可以<strong>出栈</strong>，并把对调用 <code>func1</code> 的信息传给 <code>func2</code>。</p>
+</li>
+<li><p>然后把 <code>func2(y)</code> 以及来自 <code>func1</code> 的信息，压入调用栈，</p>
+<p>最后在 <code>func2</code> 执行完成之后，把 <code>func2</code> 的结果返回到当初执行 <code>func1</code> 的那一步。</p>
+</li>
+</ol>
+<p>按照以上步骤，在执行 <code>fun1</code> 和 <code>func2</code> 时，始终只占用一个调用栈。</p>
+<p>如果是在递归的环境下也只需一个调用栈，这样便大大减小了调用栈的大小。</p>
+<h4 id="什么是尾调用-尾递归"><a href="#什么是尾调用-尾递归" class="headerlink" title="什么是尾调用 (尾递归)"></a>什么是尾调用 (尾递归)</h4><p><strong>尾调用</strong>就是函数的<strong>最后一步</strong>是执行一个函数的过程，而<strong>尾递归</strong>就是通过尾调用来完成的递归过程。</p>
+<p>譬如，形如以下代码的都是尾调用：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> a = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> b();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>而下面代码，并<strong>不是</strong>尾调用</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> a = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  b();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>原因是 <code>b()</code> 之后还隐式地执行了一段 <code>return undefined</code>，所以其最后一步并不是调用一个函数。</p>
+<p>同理，如果我们要写一个计算阶乘的程序，按照以下方式进行编写</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fac</span>(<span class="params">n</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n === <span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">return</span> n * fac(n - <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fac(<span class="number">5</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这样<strong>并不是</strong>尾调用，</p>
+<p>因为函数 <code>fac(n)</code> 中，程序在执行完 <code>fac(n-1)</code> 的函数调用之后，还需取回值来进行乘法运算。所以程序需要保留 <code>fac(n)</code> 的调用栈，以便在获得值之后相乘。</p>
+<p>我们可以通过一下代码，将其转为<strong>尾递归</strong>的写法：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fac</span>(<span class="params">n, total</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n === <span class="number">1</span>) <span class="keyword">return</span> total;</span><br><span class="line">  <span class="keyword">return</span> fac(n - <span class="number">1</span>, n * total);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fac(<span class="number">5</span>, <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="然而"><a href="#然而" class="headerlink" title="然而"></a>然而</h4><p>其实事实上，尾调用只是给数据处理提供一个新的方式，而尾递归通常都能被写成迭代的方式。</p>
+<p>但是在目前还不支持尾调用的 V8、Node.js 等环境 (可以通过<a target="_blank" rel="noopener" href="http://kangax.github.io/compat-table/es6/#test-proper_tail_calls_%28tail_call_optimisation%29">这个网站</a>查看”尾调用优化“的支持情况)，我们可以将递归改写成循环来实现。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/47155064">https://zhuanlan.zhihu.com/p/47155064</a></p>
+<p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Tail_call#Through_trampolining">Trampoline</a> 是对尾递归函数进行处理的一种技巧。我们需要先把上面的 <code>sum</code> 函数改造一下，再由 <code>trampoline</code> 函数处理即可：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> sum0 = <span class="function">(<span class="params">n, prevSum = <span class="number">0</span></span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span> n + prevSum;</span><br><span class="line">  <span class="keyword">return</span> <span class="function">() =&gt;</span> sum0(n-<span class="number">1</span>, n + prevSum)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> trampoline = <span class="function"><span class="params">f</span> =&gt;</span> <span class="function">(<span class="params">...args</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> result = f(...args);</span><br><span class="line">  <span class="keyword">while</span> (<span class="keyword">typeof</span> result === <span class="string">&#x27;function&#x27;</span>) &#123;</span><br><span class="line">    result = result();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> sum = trampoline(sum0);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sum(<span class="number">1000000</span>));   <span class="comment">// 不会栈溢出</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到，这里实际上就是把原本的递归改为了迭代，这样就不会有栈溢出的问题啦。</p>
+</blockquote>
+<p>虽然递归理论上都能改写为迭代，但有些场景下使用递归可能会更加直观，如果它能被转为”尾递归“，你就可以直接用 <code>trampoline</code> 函数进行处理，或者把它改写成迭代的方法. </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://bobbyjonas.github.io/2021/05/25/%E6%B5%85%E8%B0%88%E5%B0%BE%E9%80%92%E5%BD%92%E5%92%8C%E5%B0%BE%E8%B0%83%E7%94%A8/" data-id="ckp3ovb8v000bp4s619txh93k" class="article-share-link">分享</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag">数据结构</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%A0%88/" rel="tag">栈</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-完全搞懂promise" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2021/04/13/%E5%AE%8C%E5%85%A8%E6%90%9E%E6%87%82promise/" class="article-date">
@@ -313,7 +419,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/04/13/%E5%AE%8C%E5%85%A8%E6%90%9E%E6%87%82promise/" data-id="cknh5hrwi0008rh011ye02nj7" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/04/13/%E5%AE%8C%E5%85%A8%E6%90%9E%E6%87%82promise/" data-id="ckp3ovb8s0008p4s695qe589v" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/promise/" rel="tag">promise</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -352,7 +458,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/03/18/%E3%80%90%E4%B8%B4%E6%97%B6%E3%80%91%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0Vue%E4%B8%AD%E7%9A%84MVVM/" data-id="cknh5hrwg0007rh0175hybm4f" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/03/18/%E3%80%90%E4%B8%B4%E6%97%B6%E3%80%91%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0Vue%E4%B8%AD%E7%9A%84MVVM/" data-id="ckp3ovb8q0005p4s6f5ae9lsi" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MVVM/" rel="tag">MVVM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Vue/" rel="tag">Vue</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -519,7 +625,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/03/08/JS%E4%B8%AD%E7%9A%84%E7%BB%A7%E6%89%BF%E5%92%8C%E5%8E%9F%E5%9E%8B%E9%93%BE/" data-id="cknh5hrw50000rh01awto0j6b" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/03/08/JS%E4%B8%AD%E7%9A%84%E7%BB%A7%E6%89%BF%E5%92%8C%E5%8E%9F%E5%9E%8B%E9%93%BE/" data-id="ckp3ovb8h0000p4s6cr77dm0i" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8E%9F%E5%9E%8B%E9%93%BE/" rel="tag">原型链</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BB%A7%E6%89%BF/" rel="tag">继承</a></li></ul>
@@ -941,7 +1047,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/02/24/%E7%A7%BB%E5%8A%A8%E7%AB%AFWeb%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" data-id="cknh5hrwn000drh01aun43j12" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/02/24/%E7%A7%BB%E5%8A%A8%E7%AB%AFWeb%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" data-id="ckp3ovb8y000ep4s6d66m4k5g" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" rel="tag">移动端</a></li></ul>
@@ -1072,7 +1178,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/01/24/nuxt.js%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/" data-id="cknh5hrwc0003rh01au7l42w8" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/01/24/nuxt.js%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/" data-id="ckp3ovb8o0003p4s6ditxa11n" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nuxt/" rel="tag">nuxt</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -1230,7 +1336,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/12/28/vuex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-id="cknh5hrwd0004rh01gtio9q41" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/12/28/vuex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-id="ckp3ovb8p0004p4s67hef2rzv" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vuex/" rel="tag">vuex</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -1278,7 +1384,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/23/%E5%AE%9E%E7%8E%B0table%E5%9C%A8%E9%A1%B5%E9%9D%A2%E4%B8%AD%E5%B1%85%E4%B8%AD%E6%98%BE%E7%A4%BA/" data-id="cknh5hrwk000arh01ev074fbl" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/23/%E5%AE%9E%E7%8E%B0table%E5%9C%A8%E9%A1%B5%E9%9D%A2%E4%B8%AD%E5%B1%85%E4%B8%AD%E6%98%BE%E7%A4%BA/" data-id="ckp3ovb8t000ap4s6dtq44zg2" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/table/" rel="tag">table</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -1347,7 +1453,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/16/%E5%88%87%E6%8D%A2node%E7%9A%84%E7%89%88%E6%9C%AC/" data-id="cknh5hrwe0005rh017tiscoqe" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/16/%E5%88%87%E6%8D%A2node%E7%9A%84%E7%89%88%E6%9C%AC/" data-id="ckp3ovb8r0007p4s6ezvx8x3v" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -1428,7 +1534,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/13/%E7%94%A8hexo%E5%88%9B%E5%BB%BA%E5%8D%9A%E5%AE%A2/" data-id="cknh5hrwl000brh010j70fkcd" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/13/%E7%94%A8hexo%E5%88%9B%E5%BB%BA%E5%8D%9A%E5%AE%A2/" data-id="ckp3ovb8w000dp4s6edsfhff6" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/blog/" rel="tag">blog</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/markdown/" rel="tag">markdown</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -1440,56 +1546,12 @@
 
 
   
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/11/13/hello-world/" class="article-date">
-  <time datetime="2020-11-13T03:29:52.321Z" itemprop="datePublished">2020-11-13</time>
-</a>
+
+
+  <nav id="page-nav">
     
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/11/13/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/13/hello-world/" data-id="cknh5hrwa0001rh0110jv64ux" class="article-share-link">分享</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">下一页 &amp;raquo;</a>
+  </nav>
 
 </section>
         
@@ -1502,7 +1564,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MVVM/" rel="tag">MVVM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/" rel="tag">Vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blog/" rel="tag">blog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/markdown/" rel="tag">markdown</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nuxt/" rel="tag">nuxt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/promise/" rel="tag">promise</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/table/" rel="tag">table</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuex/" rel="tag">vuex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8E%9F%E5%9E%8B%E9%93%BE/" rel="tag">原型链</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" rel="tag">移动端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%A7%E6%89%BF/" rel="tag">继承</a></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MVVM/" rel="tag">MVVM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/" rel="tag">Vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blog/" rel="tag">blog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/markdown/" rel="tag">markdown</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nuxt/" rel="tag">nuxt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/promise/" rel="tag">promise</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/table/" rel="tag">table</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuex/" rel="tag">vuex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8E%9F%E5%9E%8B%E9%93%BE/" rel="tag">原型链</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag">数据结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%88/" rel="tag">栈</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" rel="tag">移动端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%A7%E6%89%BF/" rel="tag">继承</a></li></ul>
     </div>
   </div>
 
@@ -1512,7 +1574,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/JavaScript/" style="font-size: 15px;">JavaScript</a> <a href="/tags/MVVM/" style="font-size: 10px;">MVVM</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Web%E5%BC%80%E5%8F%91/" style="font-size: 10px;">Web开发</a> <a href="/tags/blog/" style="font-size: 10px;">blog</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/nuxt/" style="font-size: 10px;">nuxt</a> <a href="/tags/promise/" style="font-size: 10px;">promise</a> <a href="/tags/table/" style="font-size: 10px;">table</a> <a href="/tags/vue/" style="font-size: 15px;">vue</a> <a href="/tags/vuex/" style="font-size: 10px;">vuex</a> <a href="/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 20px;">前端</a> <a href="/tags/%E5%8E%9F%E5%9E%8B%E9%93%BE/" style="font-size: 10px;">原型链</a> <a href="/tags/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" style="font-size: 10px;">移动端</a> <a href="/tags/%E7%BB%A7%E6%89%BF/" style="font-size: 10px;">继承</a>
+      <a href="/tags/JavaScript/" style="font-size: 15px;">JavaScript</a> <a href="/tags/MVVM/" style="font-size: 10px;">MVVM</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Web%E5%BC%80%E5%8F%91/" style="font-size: 10px;">Web开发</a> <a href="/tags/blog/" style="font-size: 10px;">blog</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/nuxt/" style="font-size: 10px;">nuxt</a> <a href="/tags/promise/" style="font-size: 10px;">promise</a> <a href="/tags/table/" style="font-size: 10px;">table</a> <a href="/tags/vue/" style="font-size: 15px;">vue</a> <a href="/tags/vuex/" style="font-size: 10px;">vuex</a> <a href="/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 20px;">前端</a> <a href="/tags/%E5%8E%9F%E5%9E%8B%E9%93%BE/" style="font-size: 10px;">原型链</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" style="font-size: 10px;">数据结构</a> <a href="/tags/%E6%A0%88/" style="font-size: 10px;">栈</a> <a href="/tags/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" style="font-size: 10px;">移动端</a> <a href="/tags/%E7%BB%A7%E6%89%BF/" style="font-size: 10px;">继承</a>
     </div>
   </div>
 
@@ -1521,7 +1583,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">四月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">二月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">十二月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">十一月 2020</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">五月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">四月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">二月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">十二月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">十一月 2020</a></li></ul>
     </div>
   </div>
 
@@ -1532,6 +1594,10 @@
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2021/05/25/%E6%B5%85%E8%B0%88%E5%B0%BE%E9%80%92%E5%BD%92%E5%92%8C%E5%B0%BE%E8%B0%83%E7%94%A8/">浅谈尾递归和尾调用</a>
+          </li>
         
           <li>
             <a href="/2021/04/13/%E5%AE%8C%E5%85%A8%E6%90%9E%E6%87%82promise/">完全搞懂promise</a>
@@ -1547,10 +1613,6 @@
         
           <li>
             <a href="/2021/02/24/%E7%A7%BB%E5%8A%A8%E7%AB%AFWeb%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/">移动端Web开发笔记</a>
-          </li>
-        
-          <li>
-            <a href="/2021/01/24/nuxt.js%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/">nuxt.js个人使用笔记</a>
           </li>
         
       </ul>
