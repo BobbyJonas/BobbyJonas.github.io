@@ -64,6 +64,166 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-浅谈JS中奇怪的字符串" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2021/06/20/%E6%B5%85%E8%B0%88JS%E4%B8%AD%E5%A5%87%E6%80%AA%E7%9A%84%E5%AD%97%E7%AC%A6%E4%B8%B2/" class="article-date">
+  <time datetime="2021-06-20T13:39:48.245Z" itemprop="datePublished">2021-06-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/06/20/%E6%B5%85%E8%B0%88JS%E4%B8%AD%E5%A5%87%E6%80%AA%E7%9A%84%E5%AD%97%E7%AC%A6%E4%B8%B2/">浅谈JS中奇怪的字符串</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>当我再次温习 JS 中字符串的相关知识时，结合平常码代码的一些操作，头脑中又迸发了一些疑惑。</p>
+<p>这一篇博客便统一记录一下，我对于 JS 中字符串的两个疑问、以及网上的解答，以便日后来进行查阅。</p>
+<p><strong>目录：</strong></p>
+<ol>
+<li>为何 JS 中字符串也会像对象那样，有方法可以调用？</li>
+<li>字符串涉及 Unicode 字符时，为何长度的获取会如此混乱，如何统一解决？</li>
+</ol>
+<h3 id="字符串也是对象？"><a href="#字符串也是对象？" class="headerlink" title="字符串也是对象？"></a>字符串也是对象？</h3><h4 id="引子"><a href="#引子" class="headerlink" title="引子"></a>引子</h4><p>在 JavaScript 里面，对象 (object) 是个频繁出现的东西。</p>
+<p>在 ES6 的面向对象之前，我们提到的对象还不包含类 (class) 的概念，通常是<strong>自定义对象</strong>、<strong>内置对象</strong>和<strong>浏览器对象</strong>。<strong>对象</strong>包含属性和方法，出于方便，我们可以自由地去设置并调用。</p>
+<p>但是，当使用字符串时，我有一个疑惑：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> str = <span class="string">&#x27;andy&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(str.length);  <span class="comment">// 或者 console.log(&#x27;andy&#x27;.length);</span></span><br></pre></td></tr></table></figure>
+
+<p>比如：在以上的代码中，为何 <code>str</code> 是一个字符串，却像对象那样有相应的方法可以调用呢？</p>
+<p>答案是 JS 默认把我们的一些<strong>简单数据类型</strong>，包装成了<strong>复杂数据类型</strong>。</p>
+<h4 id="“基本包装类型”是什么"><a href="#“基本包装类型”是什么" class="headerlink" title="“基本包装类型”是什么"></a>“基本包装类型”是什么</h4><blockquote>
+<p>在 JavaScript 中，数据类型有基本类型和引用类型之分。</p>
+<ul>
+<li><p>基本类型：<code>undefined</code>、<code>null</code>、<code>string</code>、<code>number</code>、<code>boolean</code>、<code>symbol</code> (ES6 之后)</p>
+<p>特殊基本包装类型：<code>String</code>、<code>Number</code>、<code>Boolean</code></p>
+</li>
+<li><p>引用类型：<code>Object</code>、<code>Array</code>、<code>RegExp</code>、<code>Date</code>、<code>Function</code></p>
+</li>
+</ul>
+<p>其中，“基本类型”和“引用类型”的区别是：引用类型值可添加属性和方法，而基本类型值则不可以。</p>
+</blockquote>
+<p>我们可以注意到，为了方便我们操作基本数据类型，JS 提供了三个特殊的引用类型：<code>String</code>、<code>Number</code> 和 <code>Boolean</code>.</p>
+<p><strong>基本包装类型</strong>的概念就是将简单数据类型包装成复杂数据类型，这样基本数据类型就有了相应的属性和方法。</p>
+<p>也就是说，看似简单的一行 <code>var str = &#39;andy&#39;</code>，在 JS 内部解释器的执行过程其实是这样的：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. 生成临时变量，把简单类型包装为复杂数据类型</span></span><br><span class="line"><span class="keyword">var</span> temp = <span class="built_in">String</span>(<span class="string">&#x27;andy&#x27;</span>);   <span class="comment">// * </span></span><br><span class="line"><span class="comment">// 2. 赋值给我们声明的字符变量</span></span><br><span class="line">str = temp;</span><br><span class="line"><span class="comment">// 3. 销毁临时变量</span></span><br><span class="line">temp = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这样一来，变量 <code>str</code> 便有了 <code>String</code> 这<strong>特殊基本包装类型</strong>的属性和方法，也解释了我们心中的疑惑。</p>
+<p>至于这里为何是 <code>String</code>，而不是 <code>new String</code>，我们稍后再说。</p>
+<h4 id="字符串“不可变”"><a href="#字符串“不可变”" class="headerlink" title="字符串“不可变”"></a>字符串“不可变”</h4><p>由于 <code>String</code> 类型并非普通数据类型，这就涉及到了一个和对象相似的概念：字符串“不可变”。</p>
+<p>字符串不可变，指的是里面的值是不变的。虽然看上去可以改变内容，但其实是<strong>地址</strong>变了，内存中开辟了一个新的内存单元。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> str = <span class="string">&#x27;abc&#x27;</span>;</span><br><span class="line">str = <span class="string">&#x27;hello&#x27;</span>;</span><br><span class="line"><span class="comment">// 当重新给 str 赋值的时候，常量 &#x27;abc&#x27; 不会被修改，依然在内存中</span></span><br><span class="line"><span class="comment">// 重新给字符串赋值，会重新在内存中开辟空间，这个特点就是字符串的不可变</span></span><br></pre></td></tr></table></figure>
+
+<p>由于字符串的不可变性，我们在裁切字符串的时候也许不会分配内存空间 (参见 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management#allocation_in_javascript">MDN</a>)，但在大量拼接字符串的时候很可能会有效率问题：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> str = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">10000000</span>; i++) &#123;</span><br><span class="line">  str = <span class="string">&#x27;1&#x27;</span> + str;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(str); <span class="comment">// 这个结果需要花费大量的时间来显示，因为需要不断开辟新空间</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="为何不是-new-String？"><a href="#为何不是-new-String？" class="headerlink" title="为何不是 new String？"></a>为何不是 <code>new String</code>？</h4><p>通过上述的过程，我们知道在 JS 中：</p>
+<blockquote>
+<p>每当读取一个基本类型值的时候，后台就会自动创建一个对应的基本包装类型的对象。而且，此对象只存在于一行代码的执行瞬间，然后立即被销毁。</p>
+</blockquote>
+<p>至于为何不用 <code>new</code>，而是直接调用 <code>String(&#39;andy&#39;)</code> 或者 <code>Number(1)</code>，其原因是：</p>
+<p>把字符串，数字，布尔值传给构造函数的话，会得到对应的<strong>实例</strong>，如果对基本包装类型的实例调用 <code>typeof</code> 则会返回 <code>object</code>。所以，使用 <code>new</code> 操作符调用基本包装类型的构造函数，与直接调用同名的转型函数是不一样的。</p>
+<p>我们可以用以下的代码来进行测试：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> value = <span class="string">&#x27;123456&#x27;</span>;</span><br><span class="line"><span class="keyword">var</span> num = <span class="built_in">Number</span>(value);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> num);    <span class="comment">// number</span></span><br><span class="line"><span class="keyword">var</span> numObj = <span class="keyword">new</span> <span class="built_in">Number</span>(value);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> numObj); <span class="comment">// object</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 把字符串，数字，布尔值传给构造函数就会创建相应的实例，</span></span><br><span class="line"><span class="comment">// 对基本包装类型的实例调用 typeof 会返回 object</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(num.toString());  <span class="comment">// 测试一下方法</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="当-string-包含-Unicode-字符…"><a href="#当-string-包含-Unicode-字符…" class="headerlink" title="当 string 包含 Unicode 字符…"></a>当 <code>string</code> 包含 Unicode 字符…</h3><h4 id="一点点-Unicode-常识-原文链接"><a href="#一点点-Unicode-常识-原文链接" class="headerlink" title="(一点点) Unicode 常识 (原文链接)"></a>(一点点) Unicode 常识 (<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/54228216">原文链接</a>)</h4><p>在深入研究 JavaScript 之前，先解释一下 Unicode 一些基础知识，这样在 Unicode 方面，我们至少都了解一些。</p>
+<p><strong>Unicode</strong> 是目前绝大多数程序使用的字符编码，定义也很简单，用一个<strong>码位 (code point)</strong> 映射一个字符。码位值的范围是从 <code>U+0000</code> 到 <code>U+10FFFF</code>，可以表示超过 110 万个字符。下面是一些字符与它们的码位。</p>
+<p><strong>码位</strong>通常被格式化为十六进制数字，零填充至少四位数，格式为 <code>U+前缀</code>。</p>
+<ul>
+<li><p>Unicode 最前面的 65536 个字符位，称为<strong>基本多文种平面 (BMP - Basic Multilingual Plane</strong>, 又简称为 plane 0, <strong>零号平面</strong>)，它的码位范围是从 <code>U+0000</code> 到 <code>U+FFFF</code>。</p>
+<p>最常见的字符都放在这个平面上，这是 Unicode 最先定义和公布的一个平面。</p>
+</li>
+<li><p>剩下的字符都放在 <strong>辅助平面 (Supplementary Plane)</strong> 或者**星形平面 (astral planes)**，码位范围从 <code>U+010000</code> 一直到 <code>U+10FFFF</code>，共 16 个辅助平面。</p>
+<p>辅助平面内的码位很容易识别：如果需要超过 4 个十六进制数字来表示码位，那么它就是一个辅助平面内的码。</p>
+</li>
+</ul>
+<p>比如说：</p>
+<ul>
+<li>© 的码位是 <code>U+00A9</code>，在 <code>U+0000</code> 到 <code>U+FFFF</code> 之间，它是在<strong>基本平面</strong>上的字符。</li>
+<li>😂 的码位是 <code>U+1F602</code>，在 <code>U+010000</code> 一直到 <code>U+10FFFF</code> 之间，它是在<strong>辅助平面</strong>上的字符。</li>
+</ul>
+<p>现在对 Unicode 有了基本的了解，接下来看看它如何应用于 JavaScript 字符串。</p>
+<h4 id="转义字符"><a href="#转义字符" class="headerlink" title="转义字符"></a>转义字符</h4><p>要在 JavaScript 的字符串中表示 Unicode 字符，我们通常使用转义符 <code>\u</code>。</p>
+<p>打开 Chrome 的调式工具，在 Console 中输入带有转义符的字符串，可以得到我们的转义结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt; &#39;\u0041\u0042\u0043&#39;</span><br><span class="line">&#39;ABC&#39;</span><br><span class="line"></span><br><span class="line">&gt;&gt; &#39;I \u2661 JavaScript!&#39;</span><br><span class="line">&#39;I ♡ JavaScript!</span><br></pre></td></tr></table></figure>
+
+<p>这些被称为 <strong>Unicode 转义序列</strong>。它们由表示码位的 4 个十六进制数字组成。例如，<code>\u2661</code> 表示码位为 <code>\U+2661</code> 的字符——一个爱心。这种方法可以用于 <code>U+0000</code> 到 <code>U+FFFF</code> 范围内的码位，即整个<strong>基本平面</strong>。</p>
+<p>但是其他的所有<strong>辅助平面</strong>呢？我们需要 4 个以上的十六进制数字来表示它们的码位，那么如何转义它们呢？</p>
+<p>在 ECMAScript 6 中，这很简单，因为它引入了一种新的转义序列：<strong>Unicode 码位转义</strong>。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt; &#39;\u&#123;41&#125;\u&#123;42&#125;\u&#123;43&#125;&#39;</span><br><span class="line">&#39;ABC&#39;</span><br><span class="line"></span><br><span class="line">&gt;&gt; &#39;\u&#123;1F602&#125;&#39;</span><br><span class="line">&#39;😂&#39;</span><br></pre></td></tr></table></figure>
+
+<p>在大括号之间可以使用最多 <strong>6 个</strong>十六进制数字，这足以表示所有 Unicode 码位。</p>
+<p>但是为了向后兼容 ECMAScript 5 和更旧的环境，不幸的解决方案是使用代理对：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#39;\ud83d\ude02&#39;</span><br><span class="line">&#39;😂&#39;</span><br></pre></td></tr></table></figure>
+
+<p>在这种情况下，每个转义项表示代理项，是最终”辅助平面“字符的一半的码位。这样的两个代理项便组成一个辅助码位。</p>
+<blockquote>
+<p>注意，代理项对的码位与原始码位不相同。</p>
+<p><a target="_blank" rel="noopener" href="https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae">有公式</a>可以根据给定的辅助码位来计算代理项对码位，反之亦然——根据代理对计算原始辅助码位。</p>
+<p>TLDR：如果有辅助码位 <code>C</code>，那么其两个代理对码位 <code>H</code> 和 <code>L</code> 的计算方法为</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">H = <span class="built_in">Math</span>.floor((C - <span class="number">0x10000</span>) / <span class="number">0x400</span>) + <span class="number">0xD800</span></span><br><span class="line">L = (C - <span class="number">0x10000</span>) % <span class="number">0x400</span> + <span class="number">0xDC00</span></span><br></pre></td></tr></table></figure>
+
+<p>反之，如果有两个代理项的码位 <code>H</code> 和 <code>L</code>，则组成的辅助码位 <code>C</code> 为</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C = (H - <span class="number">0xD800</span>) * <span class="number">0x400</span> + L - <span class="number">0xDC00</span> + <span class="number">0x10000</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<h4 id="那么问题就出来了…"><a href="#那么问题就出来了…" class="headerlink" title="那么问题就出来了…"></a>那么问题就出来了…</h4><p>假设你想要计算给定字符串中的字符个数。你会怎么做呢？</p>
+<p>首先想到可能是使用 <code>length</code> 属性。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt; &#39;A&#39;.length</span><br><span class="line">1</span><br><span class="line">&gt;&gt; &#39;😂&#39;.length</span><br><span class="line">2</span><br></pre></td></tr></table></figure>
+
+<p>由于 JavaScript 内部 (ES5 之前) 将辅助平面内的字符表示为 <strong>2 个</strong>代理对，并将单独的代理对认作单独的 “字符”，所以如果仅使用 ECMAScript 5 兼容的转义序列来表示字符，将看到其 <code>length</code> 属性为 2。这是十分令人困惑的，因为人们通常只能看到一个 Unicode 字符或图形。</p>
+<p>那么我们该如何区分出来辅助平面的字符呢？以下有几个典型的 case.</p>
+<h5 id="字符串长度"><a href="#字符串长度" class="headerlink" title="字符串长度"></a>字符串长度</h5><p>我们可以用<strong>正则匹配</strong>来找出这些代理对，把两个代理对替换成一个字符，然后再用 <code>length</code> 来得出字符串长度。这种方法是兼容 ES5 的：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> regexAstralSymbols = <span class="regexp">/[\uD800-\uDBFF][\uDC00-\uDFFF]/g</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">countSymbols</span>(<span class="params">string</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> string</span><br><span class="line">		<span class="comment">// Replace every surrogate pair with a BMP symbol.</span></span><br><span class="line">		.replace(regexAstralSymbols, <span class="string">&#x27;_&#x27;</span>)</span><br><span class="line">		<span class="comment">// …and *then* get the length.</span></span><br><span class="line">		.length;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ES6 中有 <code>Array.from()</code> 方法，它能从一个类似数组或可迭代对象，创建一个新的、浅拷贝的数组实例。这个方法自身能识别出字符串中的代理对：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">countSymbols</span>(<span class="params">string</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="built_in">Array</span>.from(string).length;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="取字符串"><a href="#取字符串" class="headerlink" title="取字符串"></a>取字符串</h5><p>同样地，使用 <code>Array.from()</code>，我们能很方便地从带有 Unicode 字符的 String 中，取出我们想要的字符。此时，ES6 以下的兼容方法是使用相应的 polyfill.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">slice</span>(<span class="params">string, start, end</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">Array</span>.from(string).slice(start, end).join(<span class="string">&#x27;&#x27;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="字符串翻转"><a href="#字符串翻转" class="headerlink" title="字符串翻转"></a>字符串翻转</h5><p>字符串翻转的实现也同理：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">reverse</span>(<span class="params">string</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">Array</span>.from(string).reverse().join(<span class="string">&#x27;&#x27;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="还有一个问题…"><a href="#还有一个问题…" class="headerlink" title="还有一个问题…"></a>还有一个问题…</h4><p>上述方法虽好，但是却不能解决<strong>组合标记</strong>的问题：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">countSymbols</span>(<span class="params">string</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="built_in">Array</span>.from(string).length;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// ----------------------------------</span></span><br><span class="line"><span class="keyword">var</span> str1 = <span class="string">&#x27;😹se\xF1orita&#x27;</span>;</span><br><span class="line"><span class="keyword">var</span> str2 = <span class="string">&#x27;😹sen\u0303orita&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(str1);                <span class="comment">// 😹señorita</span></span><br><span class="line"><span class="built_in">console</span>.log(countSymbols(str1));  <span class="comment">// 9</span></span><br><span class="line"><span class="built_in">console</span>.log(str2);                <span class="comment">// 😹señorita</span></span><br><span class="line"><span class="built_in">console</span>.log(countSymbols(str2));  <span class="comment">// 10</span></span><br></pre></td></tr></table></figure>
+
+<p>比如在上述代码中，<code>str1</code> 和 <code>str2</code> 看上去都是 señorita。但是在获取长度的时候，一个字符串长为 9，另一个则是 10.</p>
+<p>这个问题看上去并不是很大，但是如果我们将上述字符串翻转的话：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">reverse</span>(<span class="params">string</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">Array</span>.from(string).reverse().join(<span class="string">&#x27;&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// ----------------------------------</span></span><br><span class="line"><span class="keyword">var</span> str1 = <span class="string">&#x27;😹se\xF1orita&#x27;</span>;</span><br><span class="line"><span class="keyword">var</span> str2 = <span class="string">&#x27;😹sen\u0303orita&#x27;</span>;</span><br><span class="line"><span class="built_in">console</span>.log(str1);                <span class="comment">// 😹señorita</span></span><br><span class="line"><span class="built_in">console</span>.log(reverse(str1));       <span class="comment">// atiroñes😹</span></span><br><span class="line"><span class="built_in">console</span>.log(str2);                <span class="comment">// 😹señorita</span></span><br><span class="line"><span class="built_in">console</span>.log(reverse(str2));       <span class="comment">// atirõnes😹</span></span><br></pre></td></tr></table></figure>
+
+<p>在 <code>ñ</code> 是单个字符的情况下，字符串翻转一切正常。<br>但在 <code>ñ</code> 为两个字符的情况下，字符串在翻转之后，<code>n</code> 上面的波浪号竟然跑到了 <code>o</code> 的上面！这可咋办？</p>
+<p>答案则是**规范化 (normalize)**。</p>
+<p>我们可以利用 <code>String.prototype.normalize</code>，使 <code>str1</code> 和 <code>str2</code> 这两个格式相互转化。如果在需要翻转的时候，我们通常把字符串统一为单字符 (即 <code>str1</code>) 的格式。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://bobbyjonas.github.io/2021/06/20/%E6%B5%85%E8%B0%88JS%E4%B8%AD%E5%A5%87%E6%80%AA%E7%9A%84%E5%AD%97%E7%AC%A6%E4%B8%B2/" data-id="ckqah81jh000b67s657qhg24r" class="article-share-link">分享</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" rel="tag">字符串</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-浅谈尾递归和尾调用" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2021/05/25/%E6%B5%85%E8%B0%88%E5%B0%BE%E9%80%92%E5%BD%92%E5%92%8C%E5%B0%BE%E8%B0%83%E7%94%A8/" class="article-date">
@@ -147,7 +307,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/05/25/%E6%B5%85%E8%B0%88%E5%B0%BE%E9%80%92%E5%BD%92%E5%92%8C%E5%B0%BE%E8%B0%83%E7%94%A8/" data-id="ckp3wqt2r000bkbs699y3h4qu" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/05/25/%E6%B5%85%E8%B0%88%E5%B0%BE%E9%80%92%E5%BD%92%E5%92%8C%E5%B0%BE%E8%B0%83%E7%94%A8/" data-id="ckqah81jg000a67s66z9udbjy" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag">数据结构</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%A0%88/" rel="tag">栈</a></li></ul>
@@ -408,7 +568,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/04/13/%E5%AE%8C%E5%85%A8%E6%90%9E%E6%87%82promise/" data-id="ckp3wqt2p0008kbs6891ca1md" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/04/13/%E5%AE%8C%E5%85%A8%E6%90%9E%E6%87%82promise/" data-id="ckqah81jf000867s66i4e6as7" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/promise/" rel="tag">promise</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -447,7 +607,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/03/18/%E3%80%90%E4%B8%B4%E6%97%B6%E3%80%91%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0Vue%E4%B8%AD%E7%9A%84MVVM/" data-id="ckp3wqt2n0005kbs651acaxf4" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/03/18/%E3%80%90%E4%B8%B4%E6%97%B6%E3%80%91%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0Vue%E4%B8%AD%E7%9A%84MVVM/" data-id="ckqah81ji000d67s603j401bq" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MVVM/" rel="tag">MVVM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Vue/" rel="tag">Vue</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -614,7 +774,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/03/08/JS%E4%B8%AD%E7%9A%84%E7%BB%A7%E6%89%BF%E5%92%8C%E5%8E%9F%E5%9E%8B%E9%93%BE/" data-id="ckp3wqt2i0001kbs6e3cz1a8m" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/03/08/JS%E4%B8%AD%E7%9A%84%E7%BB%A7%E6%89%BF%E5%92%8C%E5%8E%9F%E5%9E%8B%E9%93%BE/" data-id="ckqah81j5000067s6fc456duy" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8E%9F%E5%9E%8B%E9%93%BE/" rel="tag">原型链</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BB%A7%E6%89%BF/" rel="tag">继承</a></li></ul>
@@ -1036,7 +1196,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/02/24/%E7%A7%BB%E5%8A%A8%E7%AB%AFWeb%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" data-id="ckp3wqt2w000fkbs6hy3x3h6p" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/02/24/%E7%A7%BB%E5%8A%A8%E7%AB%AFWeb%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" data-id="ckqah81k0001n67s63eda6efo" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" rel="tag">移动端</a></li></ul>
@@ -1167,7 +1327,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/01/24/nuxt.js%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/" data-id="ckp3wqt2a0000kbs6gh6zgnvm" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/01/24/nuxt.js%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/" data-id="ckqah81jc000367s6467qg46t" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nuxt/" rel="tag">nuxt</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -1325,7 +1485,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/12/28/vuex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-id="ckp3wqt2l0003kbs67zaw7ush" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/12/28/vuex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-id="ckqah81j9000167s608yggdo2" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vuex/" rel="tag">vuex</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -1373,7 +1533,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/23/%E5%AE%9E%E7%8E%B0table%E5%9C%A8%E9%A1%B5%E9%9D%A2%E4%B8%AD%E5%B1%85%E4%B8%AD%E6%98%BE%E7%A4%BA/" data-id="ckp3wqt2q000akbs63xn6dqoc" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/23/%E5%AE%9E%E7%8E%B0table%E5%9C%A8%E9%A1%B5%E9%9D%A2%E4%B8%AD%E5%B1%85%E4%B8%AD%E6%98%BE%E7%A4%BA/" data-id="ckqah81jf000767s68lpkfmyk" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/table/" rel="tag">table</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
@@ -1442,91 +1602,10 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/16/%E5%88%87%E6%8D%A2node%E7%9A%84%E7%89%88%E6%9C%AC/" data-id="ckp3wqt2o0007kbs69lln8x9h" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2020/11/16/%E5%88%87%E6%8D%A2node%E7%9A%84%E7%89%88%E6%9C%AC/" data-id="ckqah81jd000467s6fmkk7aje" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-用hexo创建博客" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2020/11/13/%E7%94%A8hexo%E5%88%9B%E5%BB%BA%E5%8D%9A%E5%AE%A2/" class="article-date">
-  <time datetime="2020-11-13T07:32:59.633Z" itemprop="datePublished">2020-11-13</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/11/13/%E7%94%A8hexo%E5%88%9B%E5%BB%BA%E5%8D%9A%E5%AE%A2/">用hexo创建博客</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>输入命令：<br><code>npm install -g hexo-cli</code></p>
-<h3 id="创建hexo文件夹"><a href="#创建hexo文件夹" class="headerlink" title="创建hexo文件夹"></a>创建hexo文件夹</h3><p>创建一个博客目录，在该目录下<br><code>hexo init</code></p>
-<h3 id="安装依赖包"><a href="#安装依赖包" class="headerlink" title="安装依赖包"></a>安装依赖包</h3><p><code>npm install</code>站点配置</p>
-<h2 id="站点配置"><a href="#站点配置" class="headerlink" title="站点配置"></a>站点配置</h2><h3 id="必须要改动的"><a href="#必须要改动的" class="headerlink" title="必须要改动的"></a>必须要改动的</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">title: xxx  # 博客名，站点名称</span><br><span class="line">author: xxx # 博客作者名字</span><br><span class="line">description: xxx # 对站点的描述，搜索引擎会抓取，可以自定义</span><br><span class="line">language: zh-Hans # 语言 简体中文</span><br><span class="line">theme: next  # 配置主题，后面会讲到主题配置123456789</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="发布必须要增加的"><a href="#发布必须要增加的" class="headerlink" title="发布必须要增加的"></a>发布必须要增加的</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy: # 部署相关配置</span><br><span class="line">    type: git # 使用 Git 提交</span><br><span class="line">    repository: git@github.com/username/username.github.io.git # 博客仓库地址</span><br><span class="line">    #repository: https://github.com/xxx/xxx.github.io.git </span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="本地查看默认站点"><a href="#本地查看默认站点" class="headerlink" title="本地查看默认站点"></a>本地查看默认站点</h2><p>生成文件<br><code>hexo g</code> 或 <code>hexo generate</code></p>
-<p>启动服务<br><code>hexo s</code> 或 <code>hexo server</code></p>
-<p>浏览器输入<code>localhost:4000</code>查看</p>
-<h2 id="部署到github"><a href="#部署到github" class="headerlink" title="部署到github"></a>部署到github</h2><p>确认站点配置文件配置正确</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">    type: git</span><br><span class="line">    repository: https://github.com:username/username.github.io.git</span><br><span class="line">    branch: master</span><br></pre></td></tr></table></figure>
-
-<p>发布<br><code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code></p>
-<p>或<br><code>hexo clean &amp;&amp; hexo generate &amp;&amp; hexo deploy</code></p>
-<h2 id="发布文章"><a href="#发布文章" class="headerlink" title="发布文章"></a>发布文章</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new &quot;博客文章文件名&quot;</span><br></pre></td></tr></table></figure>
-
-<p>或新建md文件放到<br>/source/_posts文件夹或其子文件夹中</p>
-<p>文章要按照规定格式书写，如：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">title: 个人博客搭建详解 # 这是标题</span><br><span class="line">tags:                # 这里写的标签会自动汇集到 tags 页面上</span><br><span class="line">- 实用                # 可配置多个标签，注意格式</span><br><span class="line">- 个人博客</span><br><span class="line">category:            # 这里写的分类会自动汇集到 categories 页面上，分类可以多级</span><br><span class="line">- 实用技术            # 一级分类</span><br><span class="line">- 个人博客            # 二级分类 </span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="本地预览文章"><a href="#本地预览文章" class="headerlink" title="本地预览文章"></a>本地预览文章</h3><p>清除缓存： <code>hexo clean</code><br>生成静态网页： <code>hexo g</code><br>预览： <code>hexo s</code></p>
-<p><strong>注意</strong></p>
-<ol>
-<li>已发布的文章发生修改， 可直接预览，即 不执行上述3个命令,刷新浏览器即可;</li>
-<li>远程部署必须要执行上述命令</li>
-<li>修改内容一旦预览与修改不一致，则需要<code>clean</code></li>
-</ol>
-<p>也可一次性执行：<code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo s</code></p>
-<h2 id="创建分类及标签页面"><a href="#创建分类及标签页面" class="headerlink" title="创建分类及标签页面"></a>创建分类及标签页面</h2><h3 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h3><p>命令：<code>hexo new page &quot;categories&quot;</code></p>
-<p>找到 index.md 文件增加页面类型：</p>
-<p><code>type: “categories” #将页面的类型设置为categories</code></p>
-<h3 id="标签"><a href="#标签" class="headerlink" title="标签"></a>标签</h3><p><code>hexo new page &quot;tags&quot;</code><br>index.md文件<br>设置页面类型:<br><code>type: “tags”</code></p>
-<p>站点配置：启用分类及标签，清除缓存，生成页面，启动服务预览，无问题后发布</p>
-<h3 id="404页面"><a href="#404页面" class="headerlink" title="404页面"></a>404页面</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new page &quot;404&quot;</span><br></pre></td></tr></table></figure>
-
-<p>编辑<code>source/404.md</code>即可</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2020/11/13/%E7%94%A8hexo%E5%88%9B%E5%BB%BA%E5%8D%9A%E5%AE%A2/" data-id="ckp3wqt2v000dkbs69o298m6k" class="article-share-link">分享</a>
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/blog/" rel="tag">blog</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/markdown/" rel="tag">markdown</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li></ul>
 
     </footer>
   </div>
@@ -1553,7 +1632,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MVVM/" rel="tag">MVVM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/" rel="tag">Vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blog/" rel="tag">blog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/markdown/" rel="tag">markdown</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nuxt/" rel="tag">nuxt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/promise/" rel="tag">promise</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/table/" rel="tag">table</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuex/" rel="tag">vuex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8E%9F%E5%9E%8B%E9%93%BE/" rel="tag">原型链</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag">数据结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%88/" rel="tag">栈</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" rel="tag">移动端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%A7%E6%89%BF/" rel="tag">继承</a></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MVVM/" rel="tag">MVVM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Vue/" rel="tag">Vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web%E5%BC%80%E5%8F%91/" rel="tag">Web开发</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/blog/" rel="tag">blog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/markdown/" rel="tag">markdown</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nuxt/" rel="tag">nuxt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/promise/" rel="tag">promise</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/table/" rel="tag">table</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuex/" rel="tag">vuex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8E%9F%E5%9E%8B%E9%93%BE/" rel="tag">原型链</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" rel="tag">字符串</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag">数据结构</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A0%88/" rel="tag">栈</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" rel="tag">移动端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%A7%E6%89%BF/" rel="tag">继承</a></li></ul>
     </div>
   </div>
 
@@ -1563,7 +1642,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/JavaScript/" style="font-size: 15px;">JavaScript</a> <a href="/tags/MVVM/" style="font-size: 10px;">MVVM</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Web%E5%BC%80%E5%8F%91/" style="font-size: 10px;">Web开发</a> <a href="/tags/blog/" style="font-size: 10px;">blog</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/nuxt/" style="font-size: 10px;">nuxt</a> <a href="/tags/promise/" style="font-size: 10px;">promise</a> <a href="/tags/table/" style="font-size: 10px;">table</a> <a href="/tags/vue/" style="font-size: 15px;">vue</a> <a href="/tags/vuex/" style="font-size: 10px;">vuex</a> <a href="/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 20px;">前端</a> <a href="/tags/%E5%8E%9F%E5%9E%8B%E9%93%BE/" style="font-size: 10px;">原型链</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" style="font-size: 10px;">数据结构</a> <a href="/tags/%E6%A0%88/" style="font-size: 10px;">栈</a> <a href="/tags/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" style="font-size: 10px;">移动端</a> <a href="/tags/%E7%BB%A7%E6%89%BF/" style="font-size: 10px;">继承</a>
+      <a href="/tags/JavaScript/" style="font-size: 16.67px;">JavaScript</a> <a href="/tags/MVVM/" style="font-size: 10px;">MVVM</a> <a href="/tags/Vue/" style="font-size: 10px;">Vue</a> <a href="/tags/Web%E5%BC%80%E5%8F%91/" style="font-size: 10px;">Web开发</a> <a href="/tags/blog/" style="font-size: 10px;">blog</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/nuxt/" style="font-size: 10px;">nuxt</a> <a href="/tags/promise/" style="font-size: 10px;">promise</a> <a href="/tags/table/" style="font-size: 10px;">table</a> <a href="/tags/vue/" style="font-size: 13.33px;">vue</a> <a href="/tags/vuex/" style="font-size: 10px;">vuex</a> <a href="/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 20px;">前端</a> <a href="/tags/%E5%8E%9F%E5%9E%8B%E9%93%BE/" style="font-size: 10px;">原型链</a> <a href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" style="font-size: 10px;">字符串</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" style="font-size: 10px;">数据结构</a> <a href="/tags/%E6%A0%88/" style="font-size: 10px;">栈</a> <a href="/tags/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" style="font-size: 10px;">移动端</a> <a href="/tags/%E7%BB%A7%E6%89%BF/" style="font-size: 10px;">继承</a>
     </div>
   </div>
 
@@ -1572,7 +1651,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">五月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">四月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">二月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">十二月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">十一月 2020</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">六月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">五月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">四月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">二月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">十二月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">十一月 2020</a></li></ul>
     </div>
   </div>
 
@@ -1583,6 +1662,10 @@
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2021/06/20/%E6%B5%85%E8%B0%88JS%E4%B8%AD%E5%A5%87%E6%80%AA%E7%9A%84%E5%AD%97%E7%AC%A6%E4%B8%B2/">浅谈JS中奇怪的字符串</a>
+          </li>
         
           <li>
             <a href="/2021/05/25/%E6%B5%85%E8%B0%88%E5%B0%BE%E9%80%92%E5%BD%92%E5%92%8C%E5%B0%BE%E8%B0%83%E7%94%A8/">浅谈尾递归和尾调用</a>
@@ -1598,10 +1681,6 @@
         
           <li>
             <a href="/2021/03/08/JS%E4%B8%AD%E7%9A%84%E7%BB%A7%E6%89%BF%E5%92%8C%E5%8E%9F%E5%9E%8B%E9%93%BE/">JS中的继承和原型链</a>
-          </li>
-        
-          <li>
-            <a href="/2021/02/24/%E7%A7%BB%E5%8A%A8%E7%AB%AFWeb%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/">移动端Web开发笔记</a>
           </li>
         
       </ul>
