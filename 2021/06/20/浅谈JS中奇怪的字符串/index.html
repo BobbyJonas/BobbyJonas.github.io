@@ -15,7 +15,7 @@
 <meta property="og:description" content="当我再次温习 JS 中字符串的相关知识时，结合平常码代码的一些操作，头脑中又迸发了一些疑惑。 这一篇博客便统一记录一下，我对于 JS 中字符串的两个疑问、以及网上的解答，以便日后来进行查阅。 目录：  为何 JS 中字符串也会像对象那样，有方法可以调用？ 字符串涉及 Unicode 字符时，为何长度的获取会如此混乱，如何统一解决？  字符串也是对象？引子在 JavaScript 里面，对象 (ob">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-06-20T13:39:48.245Z">
-<meta property="article:modified_time" content="2021-06-22T07:45:38.544Z">
+<meta property="article:modified_time" content="2021-06-29T04:19:27.234Z">
 <meta property="article:author" content="Bob">
 <meta property="article:tag" content="前端">
 <meta property="article:tag" content="JavaScript">
@@ -105,8 +105,7 @@
 
 <p>比如：在以上的代码中，为何 <code>str</code> 是一个字符串，却像对象那样有相应的方法可以调用呢？</p>
 <p>答案是 JS 默认把我们的一些<strong>简单数据类型</strong>，包装成了<strong>复杂数据类型</strong>。</p>
-<h4 id="“基本包装类型”是什么"><a href="#“基本包装类型”是什么" class="headerlink" title="“基本包装类型”是什么"></a>“基本包装类型”是什么</h4><blockquote>
-<p>在 JavaScript 中，数据类型有基本类型和引用类型之分。</p>
+<h4 id="“基本包装类型”是什么"><a href="#“基本包装类型”是什么" class="headerlink" title="“基本包装类型”是什么"></a>“基本包装类型”是什么</h4><h5 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h5><p>在 JavaScript 中，数据类型有基本类型和引用类型之分。</p>
 <ul>
 <li><p>基本类型：<code>undefined</code>、<code>null</code>、<code>string</code>、<code>number</code>、<code>boolean</code>、<code>symbol</code> (ES6 之后)</p>
 <p>特殊基本包装类型：<code>String</code>、<code>Number</code>、<code>Boolean</code></p>
@@ -115,9 +114,8 @@
 </li>
 </ul>
 <p>其中，“基本类型”和“引用类型”的区别是：引用类型值可添加属性和方法，而基本类型值则不可以。</p>
-</blockquote>
 <p>我们可以注意到，为了方便我们操作基本数据类型，JS 提供了三个特殊的引用类型：<code>String</code>、<code>Number</code> 和 <code>Boolean</code>.</p>
-<p><strong>基本包装类型</strong>的概念就是将简单数据类型包装成复杂数据类型，这样基本数据类型就有了相应的属性和方法。</p>
+<h5 id="基本包装类型"><a href="#基本包装类型" class="headerlink" title="基本包装类型"></a>基本包装类型</h5><p><strong>基本包装类型</strong>的概念就是将简单数据类型包装成复杂数据类型，这样基本数据类型就有了相应的属性和方法。</p>
 <p>也就是说，看似简单的一行 <code>var str = &#39;andy&#39;</code>，在 JS 内部解释器的执行过程其实是这样的：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. 生成临时变量，把简单类型包装为复杂数据类型</span></span><br><span class="line"><span class="keyword">var</span> temp = <span class="built_in">String</span>(<span class="string">&#x27;andy&#x27;</span>);   <span class="comment">// * </span></span><br><span class="line"><span class="comment">// 2. 赋值给我们声明的字符变量</span></span><br><span class="line">str = temp;</span><br><span class="line"><span class="comment">// 3. 销毁临时变量</span></span><br><span class="line">temp = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
 
@@ -174,15 +172,16 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#39;\ud83d\ude02&#39;</span><br><span class="line">&#39;😂&#39;</span><br></pre></td></tr></table></figure>
 
 <p>在这种情况下，每个转义项表示代理项，是最终”辅助平面“字符的一半的码位。这样的两个代理项便组成一个辅助码位。</p>
-<blockquote>
-<p>注意，代理项对的码位与原始码位不相同。</p>
+<h5 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h5><p>代理项对的码位与原始码位不相同。</p>
 <p><a target="_blank" rel="noopener" href="https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae">有公式</a>可以根据给定的辅助码位来计算代理项对码位，反之亦然——根据代理对计算原始辅助码位。</p>
 <p>TLDR：如果有辅助码位 <code>C</code>，那么其两个代理对码位 <code>H</code> 和 <code>L</code> 的计算方法为</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">H = <span class="built_in">Math</span>.floor((C - <span class="number">0x10000</span>) / <span class="number">0x400</span>) + <span class="number">0xD800</span></span><br><span class="line">L = (C - <span class="number">0x10000</span>) % <span class="number">0x400</span> + <span class="number">0xDC00</span></span><br></pre></td></tr></table></figure>
 
 <p>反之，如果有两个代理项的码位 <code>H</code> 和 <code>L</code>，则组成的辅助码位 <code>C</code> 为</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C = (H - <span class="number">0xD800</span>) * <span class="number">0x400</span> + L - <span class="number">0xDC00</span> + <span class="number">0x10000</span></span><br></pre></td></tr></table></figure>
-</blockquote>
+
+
+
 <h4 id="那么问题就出来了…"><a href="#那么问题就出来了…" class="headerlink" title="那么问题就出来了…"></a>那么问题就出来了…</h4><p>假设你想要计算给定字符串中的字符个数。你会怎么做呢？</p>
 <p>首先想到可能是使用 <code>length</code> 属性。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt; &#39;A&#39;.length</span><br><span class="line">1</span><br><span class="line">&gt;&gt; &#39;😂&#39;.length</span><br><span class="line">2</span><br></pre></td></tr></table></figure>
@@ -217,7 +216,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://bobbyjonas.github.io/2021/06/20/%E6%B5%85%E8%B0%88JS%E4%B8%AD%E5%A5%87%E6%80%AA%E7%9A%84%E5%AD%97%E7%AC%A6%E4%B8%B2/" data-id="ckqgmkchm000bsj01cv50d1dv" class="article-share-link">分享</a>
+      <a data-url="https://bobbyjonas.github.io/2021/06/20/%E6%B5%85%E8%B0%88JS%E4%B8%AD%E5%A5%87%E6%80%AA%E7%9A%84%E5%AD%97%E7%AC%A6%E4%B8%B2/" data-id="ckqhjk0ko000bx0s60sxl0tiq" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" rel="tag">字符串</a></li></ul>
